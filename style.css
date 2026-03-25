@@ -1,0 +1,222 @@
+/* =================== 기본 설정 =================== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  text-align: center;
+  background: linear-gradient(to bottom, #0b3d2e, #045d4c);
+  color: white;
+  padding: 10px;
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1.2em;
+  margin: 8px 0;
+}
+
+/* =================== 배당표 =================== */
+#payoutTable {
+  font-size: 0.95em;
+  list-style: none;
+  padding: 0;
+  margin: 10px auto;
+  max-width: 320px;
+}
+
+#payoutTable li {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+#payoutTable li.highlight {
+  color: #00ff88;
+  font-weight: bold;
+  text-shadow: 0 0 8px #00ff88;
+}
+
+/* =================== 카드 컨테이너 =================== */
+.cards, .mini-cards {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+/* =================== 카드 =================== */
+.card {
+  width: 18vw;
+  max-width: 70px;
+  height: 27vw;
+  max-height: 105px;
+  perspective: 1000px;
+  cursor: pointer;
+  border-radius: 12px;
+  touch-action: manipulation;
+  transition: transform 0.2s ease;
+}
+
+.card:active {
+  transform: scale(0.95);
+}
+
+.inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform 0.6s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.inner.flip {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  user-select: none;
+}
+
+.front {
+  background: #ffffff;
+  color: #000;
+}
+
+.back {
+  background: linear-gradient(135deg,#444,#888);
+  color: white;
+  transform: rotateY(180deg);
+}
+
+/* ♥ ♦ 빨강 */
+.red { color: red; }
+
+/* 선택 카드 강조 */
+.card.selected .front {
+  background: #ffdc73;
+  box-shadow: 0 0 10px #ffdc73;
+}
+
+/* 승리 카드 강조 */
+.win-card .front {
+  background: #00ff88;
+  color: black;
+  box-shadow: 0 0 14px #00ff88;
+}
+
+/* =================== 버튼 =================== */
+button {
+  font-size: 1.1em;
+  padding: 10px 20px;
+  margin: 6px;
+  border: none;
+  border-radius: 10px;
+  background: #046d52;
+  color: white;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+  min-width: 80px;
+}
+
+button:hover, button:active {
+  background: #00b37e;
+  transform: scale(1.05);
+}
+
+/* 버튼 그룹 */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* 숨김용 클래스 */
+.hidden { display: none; }
+
+/* =================== 미니게임 카드 =================== */
+#miniGame .mini-cards {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+#miniGame .card {
+  width: 25vw;
+  height: 35vw;
+  max-width: 90px;
+  max-height: 130px;
+  perspective: 1000px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+#miniGame .card:active {
+  transform: scale(0.95);
+}
+
+#miniGame .inner {
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  transition: transform 0.6s ease-in-out;
+}
+
+/* 카드 흔들기 */
+.card.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* =================== 돈 & 결과 텍스트 강조 =================== */
+#result, #miniResult {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-top: 10px;
+  text-shadow: 0 0 8px #00ff88;
+  color: #00ff88;
+}
+
+/* =================== 반응형 =================== */
+@media (max-width: 400px) {
+  .card {
+    width: 20vw;
+    height: 30vw;
+  }
+  #miniGame .card {
+    width: 28vw;
+    height: 38vw;
+  }
+  button {
+    font-size: 1em;
+    padding: 8px 16px;
+  }
+  h1 { font-size: 1.6em; }
+  p { font-size: 1.1em; }
+  .button-group {
+    gap: 8px;
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포커 게임</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="game-container">
+  <header>
+    <h1>포커 게임</h1>
+    <p class="money-display">💰 돈: <span id="money">1000</span></p>
+    <div class="bet-container">
+      <label for="bet">베팅:</label>
+      <input type="number" id="bet" value="10" min="1">
+    </div>
+  </header>
+
+  <section class="payout-section">
+    <h3>배당표</h3>
+    <ul id="payoutTable">
+      <li id="로얄 스트레이트 플러시">로얄 스트레이트 플러시: 50배</li>
+      <li id="스트레이트 플러시">스트레이트 플러시: 30배</li>
+      <li id="포카드">포카드: 20배</li>
+      <li id="풀하우스">풀하우스: 10배</li>
+      <li id="플러시">플러시: 7배</li>
+      <li id="스트레이트">스트레이트: 5배</li>
+      <li id="트리플">트리플: 3배</li>
+      <li id="투페어">투페어: 2배</li>
+      <li id="원페어">원페어: 1배</li>
+    </ul>
+  </section>
+
+  <section id="gameArea">
+    <div id="cards" class="cards"></div>
+    <div class="button-group">
+      <button id="startBtn">시작</button>
+      <button id="exchangeBtn" style="display:none;">교환</button>
+    </div>
+    <p id="result" class="result-text"></p>
+  </section>
+
+  <!-- 🎰 미니게임 -->
+  <section id="miniGame" class="mini-game" style="display:none;">
+    <h2>더블 찬스</h2>
+    <div class="mini-cards">
+      <div id="leftCard" class="card"><div class="inner flip"><div class="front"></div><div class="back"></div></div></div>
+      <div id="rightCard" class="card"><div class="inner flip"><div class="front"></div><div class="back"></div></div></div>
+    </div>
+    <div class="button-group">
+      <button onclick="guess('high')">더 큼</button>
+      <button onclick="guess('low')">더 작음</button>
+      <button onclick="cashOut()">그만하기</button>
+    </div>
+    <p id="miniResult" class="result-text"></p>
+  </section>
+</div>
+
+</body>
+</html>
