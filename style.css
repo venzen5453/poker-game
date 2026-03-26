@@ -151,33 +151,26 @@ h1 {
 }
 
 /* =================== 카드 컨테이너 및 카드 (디자인 복원 완료) =================== */
+/* 카드 컨테이너 (모바일 한 줄 정렬 핵심) */
 .cards, .mini-cards {
-  display: flex;
+  display: flex !important;
   justify-content: center;
-  /* iOS 특유의 카드 간격 */
-  gap: 12px;
-  /* 입체적인 그림자가 잘리지 않도록 여백 증대 */
+  gap: 8px; /* 간격 좁게 조정 */
   margin: 25px 0;
-  /* 모바일 기기 화면에 맞춰 카드가 아래로 내려가게 함 */
-  flex-wrap: wrap; 
+  flex-wrap: nowrap !important; /* 절대 줄바꿈 금지 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .card {
-  /* 화면 너비의 20%를 차지하게 하여 반응형 구현 */
-  width: 20vw;
-  /* 아이폰 실제 카드 비율 고려 */
+  width: 17vw !important; /* 5장이 한 화면에 들어오는 너비 */
   max-width: 80px;
-  height: 30vw;
+  height: 25vw !important;
   max-height: 120px;
-  /* ★ 핵심: 카드가 뒤집힐 때 원거리 원근감을 주는 설정 (반드시 필요!) */
+  flex-shrink: 0 !important; /* 공간 부족해도 카드 안 찌그러지게 */
   perspective: 1000px;
   cursor: pointer;
-  /* 둥근 테두리 */
   border-radius: 12px;
-  /* iOS 터치 조작 최적화 */
-  touch-action: manipulation;
-  /* 터치 시 살짝 눌리는 애니메이션 */
-  transition: transform 0.2s ease;
 }
 
 .card:active {
@@ -361,39 +354,53 @@ button:hover, button:active {
 }
 
 /* =================== 설정 바 (오른쪽 상단 - iOS 플로팅 스타일) =================== */
+/* 설정 바 및 버튼 분리 배치 */
 .settings-bar {
   position: absolute;
   top: 20px;
-  right: 20px;
+  left: 0;
+  right: 0;
   display: flex;
-  align-items: center;
-  gap: 12px; /* 버튼 사이 간격 넉넉하게 */
+  justify-content: space-between; /* 양 끝으로 벌림 */
+  padding: 0 15px;
+  pointer-events: none; /* 클릭 방해 금지 */
   z-index: 1000;
 }
 
-/* 언어 선택창: 더 크고 선명하게 */
-/* 언어 선택창 스타일 보정 */
+#langSelect, #themeToggle {
+  pointer-events: auto; /* 버튼만 다시 클릭 가능하게 */
+}
+
+/* 언어 선택창 (왼쪽 상단 고정) */
 #langSelect {
   background: rgba(255, 255, 255, 0.15); 
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  /* 패딩 조정: 오른쪽 패딩을 왼쪽(18px)과 대칭으로 맞춤 */
-  padding: 12px 18px 12px 18px; 
+  padding: 12px 18px; 
   border-radius: 16px;
   font-size: 1rem;
   font-weight: 700;
-  outline: none;
-  cursor: pointer;
   backdrop-filter: blur(15px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  
-  /* 화살표 제거 핵심 */
-  appearance: none;
   -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: none; /* 화살표 이미지 삭제 */
-  
-  transition: all 0.2s ease;
+}
+#langSelect:focus {
+  outline: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 하얀 테두리 대신 살짝 밝아지는 효과 */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* 은은한 광채 효과 */
+}
+
+/* 다크모드 버튼 (오른쪽 상단 고정) */
+#themeToggle {
+  min-width: 54px !important;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
 }
 
 /* ❗ 핵심: 드롭다운 목록(option) 스타일 강제 지정 */
@@ -467,14 +474,43 @@ body.dark-theme button {
     gap: 10px;
   }
   
+/* 언어 변경 (왼쪽 상단) */
   #langSelect {
-    padding: 10px 14px;
+    position: absolute;
+    top: 15px;
+    left: 15px; /* 왼쪽 배치 */
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.15); 
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 14px; 
+    border-radius: 16px;
     font-size: 0.9rem;
+    font-weight: 700;
+    appearance: none;
+    -webkit-appearance: none;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
-  
+
+  /* 다크모드 버튼 (오른쪽 상단) */
   #themeToggle {
+    position: absolute;
+    top: 15px;
+    right: 15px; /* 오른쪽 배치 */
+    z-index: 1000;
+    min-width: 48px !important;
     width: 48px;
     height: 48px;
+    padding: 0 !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.3rem;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
 }
