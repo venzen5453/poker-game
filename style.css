@@ -1,62 +1,182 @@
-/* =================== 기본 설정 =================== */
+/* =================== iOS 스타일 앱 디자인 핵심 설정 =================== */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
   text-align: center;
-  background: linear-gradient(to bottom, #0b3d2e, #045d4c);
-  color: white;
-  padding: 10px;
+  /* 아이폰 다크 모드 배경색 (고급스러운 네이비) */
+  background: linear-gradient(135deg, #1d2b4f, #111a33);
+  color: #ffffff;
+  padding: 15px;
   margin: 0;
+  letter-spacing: -0.5px; /* iOS 특유의 쫀쫀한 자간 */
+  -webkit-font-smoothing: antialiased; /* 폰트 렌더링 최적화 */
 }
 
 h1 {
-  font-size: 1.8em;
-  margin-bottom: 10px;
+  font-size: 2em; /* 폰트 크기 증대 */
+  margin-bottom: 20px;
+  font-weight: 800; /* iOS 볼드체 강조 */
+  color: #ffdc73; /* 로고 포인트 컬러 */
+  text-shadow: 0 3px 6px rgba(0,0,0,0.4); /* 고급스러운 입체감 */
 }
 
-p {
+/* =================== 돈 표시 영역 (iOS 앱 상단바 스타일) =================== */
+.money-display {
+  display: inline-flex; /* 아이콘과 정렬 */
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* 아이콘과 텍스트 간격 */
+  font-size: 1.5em; /* 폰트 크기 증대 */
+  font-weight: 800; /* iOS 볼드체 */
+  color: #ffdc73; /* 황금색 */
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 입체감 */
+  background: rgba(0, 0, 0, 0.4); /* 배경 음영 */
+  padding: 10px 20px;
+  border-radius: 25px; /* 둥근 테두리 */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* iOS 특유의 그림자 */
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* 미세한 테두리 */
+}
+
+/* 이모지(돈자루)에 애니메이션 추가 (고급스러운 느낌) */
+.money-display span[role="img"] {
+  animation: shine 2s infinite alternate; /* 반짝임 */
+}
+
+@keyframes shine {
+  from { opacity: 0.8; }
+  to { opacity: 1; }
+}
+
+/* =================== 배팅 선택박스 (iOS 앱 입력창 스타일) =================== */
+.bet-container {
+  display: inline-block;
+  margin-top: 5px;
+}
+
+#bet {
   font-size: 1.2em;
-  margin: 8px 0;
+  /* 패딩 조정: 오른쪽 패딩을 왼쪽(20px)과 대칭으로 맞춤 */
+  padding: 15px 20px 15px 20px; 
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(29, 43, 79, 0.8); 
+  color: #ffffff;
+  font-weight: 800;
+  text-align: left;
+  
+  /* 화살표 제거 핵심 */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none; /* 화살표 이미지 삭제 */
+  
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  min-width: 130px; 
 }
 
-/* =================== 배당표 =================== */
+/* 셀렉트 내부 옵션 창 스타일 (iOS 스타일의 배경색 대응) */
+#bet option {
+  background-color: #111a33; /* option 배경색 (배경색과 맞춤) */
+  color: white;
+  font-weight: 600;
+}
+
+#bet:hover, #bet:focus {
+  border: 1px solid rgba(255, 255, 255, 0.4); /* 테두리 강조 */
+  transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+  outline: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4); /* 그림자 강조 */
+}
+
+
+
+/* 선택된 카드(HOLD) 스타일 */
+.card.selected::after {
+    content: "HOLD";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffcc00;
+    color: #000;
+    padding: 2px 8px;
+    font-weight: bold;
+    font-size: 12px;
+    border-radius: 4px;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* 선택된 카드의 테두리 강조 */
+.card.selected .inner {
+    outline: 3px solid #ffcc00;
+    border-radius: 8px;
+}
+
+
+
+/* =================== 배당표 (iOS 앱 카드 스타일) =================== */
 #payoutTable {
-  font-size: 0.95em;
+  font-size: 1.1em; /* 폰트 크기 증대 */
   list-style: none;
   padding: 0;
-  margin: 10px auto;
-  max-width: 320px;
+  margin: 20px auto;
+  max-width: 350px;
+  /* iOS 특유의 카드 배경 (반투명 네이비) */
+  background: rgba(29, 43, 79, 0.6);
+  border-radius: 20px; /* 둥근 테두리 */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3); /* 그림자 */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* 미세한 테두리 */
 }
 
 #payoutTable li {
-  padding: 4px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.05); /* iOS 특유의 미세한 구분선 */
+  display: flex; /* 항목과 배수 정렬 */
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+}
+
+#payoutTable li:last-child {
+  border-bottom: none; /* 마지막 구분선 제거 */
 }
 
 #payoutTable li.highlight {
-  color: #00ff88;
-  font-weight: bold;
-  text-shadow: 0 0 8px #00ff88;
+  color: #00ff88; /* 당첨 시 연두색 */
+  font-weight: 800; /* iOS 볼드체 */
+  text-shadow: 0 0 10px #00ff88; /* 반짝임 */
 }
 
-/* =================== 카드 컨테이너 =================== */
+/* =================== 카드 컨테이너 및 카드 (디자인 복원 완료) =================== */
 .cards, .mini-cards {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin: 15px 0;
-  flex-wrap: wrap;
+  /* iOS 특유의 카드 간격 */
+  gap: 12px;
+  /* 입체적인 그림자가 잘리지 않도록 여백 증대 */
+  margin: 25px 0;
+  /* 모바일 기기 화면에 맞춰 카드가 아래로 내려가게 함 */
+  flex-wrap: wrap; 
 }
 
-/* =================== 카드 =================== */
 .card {
-  width: 18vw;
-  max-width: 70px;
-  height: 27vw;
-  max-height: 105px;
+  /* 화면 너비의 20%를 차지하게 하여 반응형 구현 */
+  width: 20vw;
+  /* 아이폰 실제 카드 비율 고려 */
+  max-width: 80px;
+  height: 30vw;
+  max-height: 120px;
+  /* ★ 핵심: 카드가 뒤집힐 때 원거리 원근감을 주는 설정 (반드시 필요!) */
   perspective: 1000px;
   cursor: pointer;
+  /* 둥근 테두리 */
   border-radius: 12px;
+  /* iOS 터치 조작 최적화 */
   touch-action: manipulation;
+  /* 터치 시 살짝 눌리는 애니메이션 */
   transition: transform 0.2s ease;
 }
 
@@ -68,105 +188,133 @@ p {
   width: 100%;
   height: 100%;
   position: relative;
-  transform-style: preserve-3d;
-  transform: rotateY(0deg);
-  transition: transform 0.6s ease-in-out;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  /* ★ 핵심: 앞면과 뒷면이 3D 공간에 공존하게 함 (이게 빠져서 납작해 보였음!) */
+  transform-style: preserve-3d; 
+  /* 탄력감 있는 애니메이션 타이밍 함수 적용 */
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+  /* iOS 특유의 그림자 강화 */
+  box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+  border-radius: 12px;
 }
 
+/* flip 클래스가 붙으면 뒷면이 보이게 회전 */
 .inner.flip {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) !important;
 }
 
 .front, .back {
   position: absolute;
   width: 100%;
   height: 100%;
+  /* 뒤집혔을 때 반대면이 안 보이게 설정 */
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; 
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
+  /* iOS 볼드체 및 큰 폰트 크기 */
+  font-weight: 800;
+  font-size: 1.5em;
+  /* 텍스트 선택 방지 */
   user-select: none;
 }
 
 .front {
   background: #ffffff;
   color: #000;
+  /* 미세한 입체감 테두리 */
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .back {
-  background: linear-gradient(135deg,#444,#888);
+  /* iOS 다크 모드 스타일의 카드 뒷면 패턴 */
+  background: linear-gradient(135deg, #444, #888);
   color: white;
   transform: rotateY(180deg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* ♥ ♦ 빨강 */
-.red { color: red; }
+.red { color: #ff3b30; } /* iOS 특유의 빨간색 */
 
-/* 선택 카드 강조 */
-.card.selected .front {
-  background: #ffdc73;
-  box-shadow: 0 0 10px #ffdc73;
+/* 선택 카드 강조 (iOS 스타일의 밝은 노랑) */
+.card.selected .inner {
+  box-shadow: 0 0 20px #ffdc73; /* 빛나는 효과 */
+  transform: translateY(-5px); /* 살짝 떠오르는 효과 */
 }
 
-/* 승리 카드 강조 */
+/* 승리 카드 강조 (iOS 스타일의 연두색) */
 .win-card .front {
-  background: #00ff88;
-  color: black;
-  box-shadow: 0 0 14px #00ff88;
+  box-shadow: 0 0 20px #00ff88; /* 빛나는 효과 */
+  border: 2px solid #00ff88; /* 테두리 강조 */
+  animation: winGlow 1.5s infinite alternate; /* 번쩍임 */
 }
 
-/* =================== 버튼 =================== */
+@keyframes winGlow {
+  from { box-shadow: 0 0 10px #00ff88; }
+  to { box-shadow: 0 0 25px #00ff88; }
+}
+
+/* =================== 버튼 (iOS 앱 버튼 스타일) =================== */
 button {
-  font-size: 1.1em;
-  padding: 10px 20px;
-  margin: 6px;
+  font-size: 1.2em; /* 폰트 크기 증대 */
+  padding: 15px 30px;
+  margin: 10px;
   border: none;
-  border-radius: 10px;
-  background: #046d52;
+  border-radius: 25px; /* 둥근 테두리 */
+  background: linear-gradient(to bottom, #007aff, #005ecb); /* iOS 파란색 */
   color: white;
-  font-weight: bold;
-  transition: background 0.3s, transform 0.2s;
-  min-width: 80px;
+  font-weight: 800; /* iOS 볼드체 */
+  box-shadow: 0 6px 18px rgba(0,122,255,0.4); /* 그림자 */
+  transition: all 0.3s ease; /* 부드러운 애니메이션 */
+  min-width: 120px; /* 버튼 크기 유지 */
+  letter-spacing: -0.5px; /* iOS 자간 */
 }
 
 button:hover, button:active {
-  background: #00b37e;
-  transform: scale(1.05);
+  background: linear-gradient(to bottom, #3498ff, #007aff); /* 호버/액티브 색상 */
+  transform: translateY(-3px); /* 떠오르는 효과 */
+  box-shadow: 0 8px 24px rgba(0,122,255,0.5); /* 그림자 강조 */
 }
 
 /* 버튼 그룹 */
 .button-group {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 10px;
+  gap: 15px; /* iOS 특유의 간격 */
+  flex-wrap: wrap; /* 모바일 대응 */
+  margin-top: 15px;
 }
 
 /* 숨김용 클래스 */
 .hidden { display: none; }
 
-/* =================== 미니게임 카드 =================== */
+/* =================== 미니게임 (수정) =================== */
+#miniGame {
+  margin-top: 30px;
+  border-top: 2px solid rgba(255, 255, 255, 0.1); /* 미세한 구분선 */
+  padding-top: 20px;
+}
+
+#miniGame h2 {
+  font-size: 1.8em; /* 폰트 크기 증대 */
+  margin-bottom: 20px;
+  color: #ffdc73; /* 황금색 */
+  font-weight: 800; /* iOS 볼드체 */
+}
+
 #miniGame .mini-cards {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 15px 0;
+  gap: 20px; /* 카드 간격 증대 */
 }
 
 #miniGame .card {
-  width: 25vw;
+  width: 25vw; /* 모바일 대응 */
   height: 35vw;
   max-width: 90px;
   max-height: 130px;
   perspective: 1000px;
   border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
 #miniGame .card:active {
@@ -174,8 +322,8 @@ button:hover, button:active {
 }
 
 #miniGame .inner {
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-  transition: transform 0.6s ease-in-out;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6); /* 그림자 강화 */
+  border-radius: 12px;
 }
 
 /* 카드 흔들기 */
@@ -191,32 +339,142 @@ button:hover, button:active {
   100% { transform: rotate(0deg); }
 }
 
-/* =================== 돈 & 결과 텍스트 강조 =================== */
+/* =================== 돈 & 결과 텍스트 강조 (수정) =================== */
 #result, #miniResult {
-  font-size: 1.3em;
-  font-weight: bold;
-  margin-top: 10px;
-  text-shadow: 0 0 8px #00ff88;
-  color: #00ff88;
+  font-size: 1.6em; /* 폰트 크기 증대 */
+  font-weight: 800; /* iOS 볼드체 */
+  margin-top: 20px;
+  color: #00ff88; /* 당첨 시 연두색 */
+  text-shadow: 0 0 10px #00ff88; /* 반짝임 */
 }
 
-/* =================== 반응형 =================== */
+/* =================== 반응형 최적화 (iOS 모바일 특화) =================== */
 @media (max-width: 400px) {
-  .card {
-    width: 20vw;
-    height: 30vw;
-  }
-  #miniGame .card {
-    width: 28vw;
-    height: 38vw;
-  }
-  button {
-    font-size: 1em;
-    padding: 8px 16px;
-  }
   h1 { font-size: 1.6em; }
-  p { font-size: 1.1em; }
-  .button-group {
-    gap: 8px;
+  .money-display { font-size: 1.2em; padding: 8px 15px; }
+  #bet { font-size: 1.1em; padding: 12px 35px 12px 12px; min-width: 110px; }
+  #payoutTable { font-size: 1em; padding: 10px; margin: 15px auto; }
+  .card { width: 18vw; height: 27vw; max-width: 65px; max-height: 95px; }
+  #miniGame .card { width: 23vw; height: 32vw; max-width: 80px; max-height: 110px; }
+  button { font-size: 1em; padding: 12px 20px; min-width: 100px; }
+  .button-group { gap: 10px; }
+}
+
+/* =================== 설정 바 (오른쪽 상단 - iOS 플로팅 스타일) =================== */
+.settings-bar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 버튼 사이 간격 넉넉하게 */
+  z-index: 1000;
+}
+
+/* 언어 선택창: 더 크고 선명하게 */
+/* 언어 선택창 스타일 보정 */
+#langSelect {
+  background: rgba(255, 255, 255, 0.15); 
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  /* 패딩 조정: 오른쪽 패딩을 왼쪽(18px)과 대칭으로 맞춤 */
+  padding: 12px 18px 12px 18px; 
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  
+  /* 화살표 제거 핵심 */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none; /* 화살표 이미지 삭제 */
+  
+  transition: all 0.2s ease;
+}
+
+/* ❗ 핵심: 드롭다운 목록(option) 스타일 강제 지정 */
+#langSelect option {
+  background-color: #1c1c1e; /* iOS 다크모드 배경색으로 고정 */
+  color: #ffffff; /* 글자색 흰색으로 고정 */
+  padding: 10px;
+  font-size: 1rem;
+}
+
+/* 다크모드일 때 언어 선택창 배경 최적화 */
+body.dark-theme #langSelect {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* 다크모드 토글 버튼: 더 크고 직관적으로 */
+#themeToggle {
+  min-width: 54px !important;
+  width: 54px;
+  height: 54px;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 16px !important; /* 원형에서 둥근 사각형으로 변경 (최신 iOS 트렌드) */
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem; /* 아이콘 크기 대폭 증대 */
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 버튼 클릭 시 눌리는 효과 (Touch Feedback) */
+#langSelect:active, #themeToggle:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* =================== 다크 모드 (완전한 블랙 & 고대비) =================== */
+body.dark-theme {
+  background: linear-gradient(135deg, #000000, #1c1c1e) !important; /* iOS 시스템 블랙 */
+}
+
+body.dark-theme .settings-bar #langSelect,
+body.dark-theme .settings-bar #themeToggle {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 다크모드에서 배당표 및 입력창 가독성 최적화 */
+body.dark-theme #payoutTable,
+body.dark-theme #bet {
+  background: rgba(44, 44, 46, 0.8); /* iOS 다크모드 보조 배경색 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme button {
+  background: linear-gradient(to bottom, #3a3a3c, #1c1c1e);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* =================== 모바일 반응형 최적화 =================== */
+@media (max-width: 400px) {
+  .settings-bar {
+    top: 10px;
+    right: 10px;
+    gap: 10px;
+  }
+  
+  #langSelect {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+  
+  #themeToggle {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
   }
 }
