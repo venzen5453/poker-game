@@ -617,18 +617,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 3600 * 1000); // 3600초 * 1000ms
 });
 
-/* 📱 모바일 줌 및 더블 탭 방지 스크립트 */
+// 핀치 줌(두 손가락) 방지
 document.addEventListener('touchstart', function (event) {
   if (event.touches.length > 1) {
-    event.preventDefault(); // 핀치 줌 방지
+    event.preventDefault();
   }
-}, { passive: false });
+}, { passive: false }); // passive를 false로 해야 preventDefault가 작동함
 
+// 더블 탭 확대 방지
 let lastTouchEnd = 0;
 document.addEventListener('touchend', function (event) {
   const now = (new Date()).getTime();
   if (now - lastTouchEnd <= 300) {
-    event.preventDefault(); // 더블 탭 방지
+    event.preventDefault();
   }
   lastTouchEnd = now;
 }, false);
