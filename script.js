@@ -611,13 +611,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     money += 500;
     updateMoney();
+    // 콘솔에만 기록 (개발자 도구에서 확인 가능, 화면에는 안 보임)
+    console.log("🎁 Hourly bonus 500 added.");
     
-    // 알림 표시 (선택 사항)
-    const resultEl = document.getElementById("result");
-    if (resultEl) {
-      resultEl.innerText = "🎁 시간 보너스 500원이 지급되었습니다!";
-      setTimeout(() => { resultEl.innerText = ""; }, 3000);
-    }
   }, 3600 * 1000); // 3600초 * 1000ms
 });
 
