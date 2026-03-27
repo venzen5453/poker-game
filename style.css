@@ -195,58 +195,76 @@ h1 {
 
 .card.joker-card {
     border-radius: 12px;
-    overflow: hidden; /* 테두리 밖으로 안 나가게 */
+    perspective: 1000px; /* 3D 효과 강화 */
 }
 
-/* 1. 조커 카드 기본 외형 (황금빛 테두리와 배경) */
+/* 2. 조커 카드 앞면 수정 */
 .card.joker-card .front {
     background: linear-gradient(135deg, #fffcf0 0%, #fff5d1 100%) !important;
-    border: 2px solid #ff3b30 !important; /* iOS 골드 컬러 */
+    border: 2px solid #ff3b30 !important;
     box-shadow: inset 0 0 15px rgba(250, 198, 198);
-    
-    /* 🃏 내부 요소 세로 정렬 */
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     padding: 5px;
     box-sizing: border-box;
+
+    /* ✅ 추가: 뒷면일 때 숨김 처리 */
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    transform-style: preserve-3d;
 }
 
-/* 2. 조커 이미지 스타일 (중앙 배치, 부드러운 처리) */
+
+/* 3. ✅ [핵심] 뒷면 투과 방지 설정 */
+/* 카드가 뒤집힌 상태(.flip)일 때 조커 내부의 이미지와 글자를 아예 안보이게 함 */
+.card.joker-card .inner.flip .front img.joker-img,
+.card.joker-card .inner.flip .front span.joker-text {
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* 카드가 다시 앞면일 때는 보이게 함 */
+.card.joker-card .inner:not(.flip) .front img.joker-img,
+.card.joker-card .inner:not(.flip) .front span.joker-text {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* 4. 조커 이미지 및 텍스트 기존 설정 유지 (z-index 확인) */
 .card.joker-card .front img.joker-img {
-    width: 80%; /* 카드 너비의 80% */
+    width: 80%;
     height: auto;
-    max-height: 65%; /* 텍스트 공간 확보를 위해 70%에서 65%로 살짝 조정 */
-    object-fit: contain; /* 이미지가 찌그러지지 않고 비율 유지 */
+    max-height: 65%;
+    object-fit: contain;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); 
     margin-bottom: 5px;
-    /* 추가 설정: 요소가 겹치지 않게 우선순위 부여 */
     position: relative;
-    z-index: 2;
+    z-index: 1; /* z-index를 너무 높이지 않음 */
+    backface-visibility: hidden;
 }
 
-/* 3. 조커 영어 텍스트 스타일 (iOS 세리프 폰트로 고급스럽게) */
 .card.joker-card .front span.joker-text {
     font-family: "Times New Roman", Times, serif;
-    font-size: 0.8em !important; /* 모바일에서 이미지가 밀리지 않게 크기 최적화 */
+    font-size: 0.8em !important;
     font-weight: 800;
     color: #ff3b30 !important;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0;
     line-height: 1;
-    /* 추가 설정: 텍스트가 선명하게 보이도록 */
     position: relative;
-    z-index: 2;
+    z-index: 1;
+    backface-visibility: hidden;
 }
 
-/* 다크모드 전용 효과 추가 (맨 아래에 추가) */
+
 body.dark-theme .card.joker-card .front img.joker-img {
     filter: drop-shadow(0 4px 10px rgba(250, 198, 198)); /* 어둠 속에서 조커 이미지가 금빛으로 빛남 */
 }
 
-/* 4. 조커가 포함된 승리 시 애니메이션 (강력한 황금빛 발광) */
+
 .win-card.joker-card .front {
     animation: jokerWinGlow 1.5s infinite alternate !important;
     border: 2px solid #ff3b30 !important;

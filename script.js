@@ -236,7 +236,7 @@ function updateMoney() {
   localStorage.setItem('poker-money', money);
 }
 
-/* 🚀 게임 흐름 */
+/* 🚀 게임 흐름 시작 */
 function startGame() {
   if (phase !== "idle") return;
   const betSelect = document.getElementById("bet");
@@ -256,6 +256,8 @@ function startGame() {
   document.getElementById("result").innerText = "";
   setTimeout(() => { phase = "draw"; }, 1000);
 }
+/* 🚀 게임 흐름 종료  */
+
 
 // 2. 교환(Exchange) 시 조커 이미지 처리
 function exchange() {
