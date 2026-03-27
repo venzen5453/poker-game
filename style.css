@@ -163,18 +163,103 @@ h1 {
 }
 
 .card {
-  width: 17vw !important; /* 5장이 한 화면에 들어오는 너비 */
-  max-width: 80px;
-  height: 25vw !important;
-  max-height: 120px;
-  flex-shrink: 0 !important; /* 공간 부족해도 카드 안 찌그러지게 */
-  perspective: 1000px;
-  cursor: pointer;
-  border-radius: 12px;
+    width: 17vw !important; /* 5장이 한 화면에 들어오는 너비 */
+    max-width: 80px;
+    height: 25vw !important;
+    max-height: 120px;
+    flex-shrink: 0 !important; /* 공간 부족해도 카드 안 찌그러지게 */
+    perspective: 1000px;
+    cursor: pointer;
+    border-radius: 12px;
+    position: relative;
+    user-select: none;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:active {
   transform: scale(0.95);
+}
+
+/* =================== 🃏 조커 카드 특수 스타일 =================== */
+/* =================== 🃏 조커 카드 (이미지 & 영어 텍스트) =================== */
+
+.card.joker-card {
+    border-radius: 12px;
+    overflow: hidden; /* 테두리 밖으로 안 나가게 */
+}
+
+/* 1. 조커 카드 기본 외형 (황금빛 테두리와 배경) */
+.card.joker-card .front {
+    background: linear-gradient(135deg, #fffcf0 0%, #fff5d1 100%) !important;
+    border: 2px solid #ff3b30 !important; /* iOS 골드 컬러 */
+    box-shadow: inset 0 0 15px rgba(250, 198, 198);
+    
+    /* 🃏 내부 요소 세로 정렬 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+/* 2. 조커 이미지 스타일 (중앙 배치, 부드러운 처리) */
+.card.joker-card .front img.joker-img {
+    width: 80%; /* 카드 너비의 80% */
+    height: auto;
+    max-height: 65%; /* 텍스트 공간 확보를 위해 70%에서 65%로 살짝 조정 */
+    object-fit: contain; /* 이미지가 찌그러지지 않고 비율 유지 */
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); 
+    margin-bottom: 5px;
+    /* 추가 설정: 요소가 겹치지 않게 우선순위 부여 */
+    position: relative;
+    z-index: 2;
+}
+
+/* 3. 조커 영어 텍스트 스타일 (iOS 세리프 폰트로 고급스럽게) */
+.card.joker-card .front span.joker-text {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 0.8em !important; /* 모바일에서 이미지가 밀리지 않게 크기 최적화 */
+    font-weight: 800;
+    color: #ff3b30 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    line-height: 1;
+    /* 추가 설정: 텍스트가 선명하게 보이도록 */
+    position: relative;
+    z-index: 2;
+}
+
+/* 다크모드 전용 효과 추가 (맨 아래에 추가) */
+body.dark-theme .card.joker-card .front img.joker-img {
+    filter: drop-shadow(0 4px 10px rgba(250, 198, 198)); /* 어둠 속에서 조커 이미지가 금빛으로 빛남 */
+}
+
+/* 4. 조커가 포함된 승리 시 애니메이션 (강력한 황금빛 발광) */
+.win-card.joker-card .front {
+    animation: jokerWinGlow 1.5s infinite alternate !important;
+    border: 2px solid #ff3b30 !important;
+}
+
+@keyframes jokerWinGlow {
+    from { box-shadow: 0 0 15px #ff3b30; transform: scale(1.02); }
+    to { box-shadow: 0 0 35px #ff3b30, 0 0 15px #ffffff; transform: scale(1.08); }
+}
+
+/* 5. 다크 모드에서의 조커 스타일 최적화 (이미지 반전 안 함) */
+body.dark-theme .card.joker-card .front {
+    background: linear-gradient(135deg, #2c2c2e, #1c1c1e) !important;
+    border: 2px solid #ff3b30 !important;
+}
+body.dark-theme .card.joker-card .front span.joker-text {
+    color: #ff3b30 !important; /* 다크모드에선 글자도 금색 */
+}
+
+/* 6. 조커 카드 전용 HOLD 스타일 (색상 차별화) */
+.card.joker-card.selected::after {
+    background: #ff3b30; /* 조커 홀드는 빨간색 */
+    color: #ffffff;
 }
 
 .inner {
@@ -381,7 +466,7 @@ button:hover, button:active {
   font-size: 1rem;
   font-weight: 700;
   backdrop-filter: blur(15px);
-  -webkit-appearance: none;
+
 }
 #langSelect:focus {
   outline: none !important;
@@ -513,4 +598,17 @@ body.dark-theme button {
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
   }
+}
+
+
+#clickRefillBtn {
+  transition: transform 0.1s ease, background-color 0.2s;
+}
+
+#clickRefillBtn:hover {
+  background-color: #ffd633 !important; /* 마우스 올리면 더 밝게 */
+}
+
+#clickRefillBtn:active {
+  transform: scale(0.95); /* 누르는 순간 살짝 들어가는 효과 */
 }

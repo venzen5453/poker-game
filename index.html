@@ -28,25 +28,34 @@
       <span id="money">1,000</span>
     </div>
     
-    <div class="bet-container">
+  <div class="bet-container">
       <label for="bet" id="ui-bet-label">베팅:</label>
-      <select id="bet">
-        </select>
+      <select id="bet"></select>
     </div>
+
+ <div class="bonus-container" style="text-align: center; margin-top: 10px;">
+  <button id="clickRefillBtn" style="cursor:pointer; padding: 5px 15px; border-radius: 20px; background: #ffcc00; border: none; font-weight: bold;">
+    <span id="ui-refill-text">💰 1원 받기</span>
+  </button>
+  <p id="ui-bonus-info" style="font-size: 12px; color: #888; margin-top: 5px;">
+    (1시간마다 500원 자동 지급)
+  </p>
+</div>
   </header>
 
   <section class="payout-section">
     <h3 id="ui-payout-title">배당표</h3>
     <ul id="payoutTable">
-      <li id="로얄 스트레이트 플러시"><span>로얄 스트레이트 플러시</span> <span>30배</span></li>
-      <li id="스트레이트 플러시"><span>스트레이트 플러시</span> <span>20배</span></li>
-      <li id="포카드"><span>포카드</span> <span>10배</span></li>
+      <li id="파이브 카드"><span>파이브 카드</span> <span>100배</span></li>
+      <li id="로얄 스트레이트 플러시"><span>로얄 스트레이트 플러시</span> <span>50배</span></li>
+      <li id="스트레이트 플러시"><span>스트레이트 플러시</span> <span>30배</span></li>
+      <li id="포카드"><span>포카드</span> <span>15배</span></li>
       <li id="풀하우스"><span>풀하우스</span> <span>7배</span></li>
       <li id="플러시"><span>플러시</span> <span>5배</span></li>
       <li id="스트레이트"><span>스트레이트</span> <span>3배</span></li>
       <li id="트리플"><span>트리플</span> <span>2배</span></li>
       <li id="투페어"><span>투페어</span> <span>1배</span></li>
-      <li id="원페어"><span>원페어</span> <span>0배</span></li>
+      <li id="원페어"><span>원페어</span> <span>0.5배</span></li>
     </ul>
   </section>
 
@@ -75,6 +84,7 @@
         </div>
       </div>
     </div>
+    
     
     <div class="button-group">
       <button id="ui-high-btn" onclick="guess('high')">더 큼</button>
