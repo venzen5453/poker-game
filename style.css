@@ -129,35 +129,60 @@ h1 {
 
 /* =================== 배당표 (iOS 앱 카드 스타일) =================== */
 #payoutTable {
-  font-size: 1.1em; /* 폰트 크기 증대 */
+  font-size: 0.9em; /* 2열 배치를 위해 폰트 살짝 조정 */
   list-style: none;
-  padding: 0;
+  padding: 5px;
   margin: 20px auto;
-  max-width: 350px;
-  /* iOS 특유의 카드 배경 (반투명 네이비) */
+  max-width: 500px;
+  
+  /* iOS 카드 배경 */
   background: rgba(29, 43, 79, 0.6);
-  border-radius: 20px; /* 둥근 테두리 */
-  box-shadow: 0 6px 18px rgba(0,0,0,0.3); /* 그림자 */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* 미세한 테두리 */
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* 그리드 설정 */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
 }
 
 #payoutTable li {
-  padding: 10px 15px;
-  border-bottom: 1px solid rgba(255,255,255,0.05); /* iOS 특유의 미세한 구분선 */
-  display: flex; /* 항목과 배수 정렬 */
+  padding: 10px 12px;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-#payoutTable li:last-child {
-  border-bottom: none; /* 마지막 구분선 제거 */
+/* --- [핵심] 순서 뒤집기 --- */
+
+/* 1~5번 항목(높은 족보)을 오른쪽 열(order: 2)로 보냄 */
+#payoutTable li:nth-child(-n+5) {
+  order: 2;
+  border-right: none; /* 오른쪽 열이 되므로 오른쪽 선 제거 */
+}
+
+/* 6~10번 항목(플러시~원페어)을 왼쪽 열(order: 1)로 보냄 */
+#payoutTable li:nth-child(n+6) {
+  order: 1;
+  border-right: 1px solid rgba(255,255,255,0.1); /* 왼쪽 열이 되므로 구분선 추가 */
+}
+
+/* --- 테두리 정리 --- */
+
+/* 각 열의 마지막 항목(5번, 10번) 하단 선 제거 */
+#payoutTable li:nth-child(5),
+#payoutTable li:nth-child(10) {
+  border-bottom: none;
 }
 
 #payoutTable li.highlight {
-  color: #00ff88; /* 당첨 시 연두색 */
-  font-weight: 800; /* iOS 볼드체 */
-  text-shadow: 0 0 10px #00ff88; /* 반짝임 */
+  color: #00ff88;
+  font-weight: 800;
+  text-shadow: 0 0 10px #00ff88;
 }
 
 /* =================== 카드 컨테이너 및 카드 (디자인 복원 완료) =================== */
