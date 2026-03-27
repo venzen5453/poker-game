@@ -174,17 +174,33 @@ function changeLanguage(lang) {
   });
 }
 
-// 1. 메인 게임 화면에 카드를 그리는 함수
 function render() {
   const container = document.getElementById("cards");
+  if (!container) return; 
+  
   container.innerHTML = "";
   
+  // 1. 족보 계산 및 결과 텍스트 업데이트 (여기서 한글로 결정됨)
+  const resultText = checkHand(hand); 
+  const resultElement = document.getElementById("result");
+  if (resultElement) {
+    resultElement.innerText = resultText; // "원페어 (A)" 등으로 표시
+  }
+
   hand.forEach((card, i) => {
     const wrap = document.createElement("div");
     wrap.className = "card";
     
-    // 조커일 경우 전용 클래스 추가
-    if (card.value === "JOKER") wrap.classList.add("joker-card");
+    const isJoker = (card.value === "JOKER" || card.rank === "JOKER");
+    if (isJoker) wrap.classList.add("joker-card");
+
+    // 🏆 [핵심 수정] 객체 비교(includes) 대신 값 비교(some) 사용
+    if (window.winCards && window.winCards.length > 0) {
+      const isWin = window.winCards.some(wc => 
+        wc.value === card.value && wc.suit === card.suit
+      );
+      if (isWin) wrap.classList.add("win-card");
+    }
 
     const inner = document.createElement("div");
     inner.className = "inner flip"; 
@@ -192,17 +208,16 @@ function render() {
     const front = document.createElement("div");
     front.className = "front";
     
-    // 🃏 조커라면 이미지 + 영어 텍스트 삽입
-    if (card.value === "JOKER") {
-      front.innerHTML = `
-        <img src="jokerimg.png" class="joker-img">
-        <span class="joker-text">JOKER</span>
-      `;
+    if (isJoker) {
+      front.innerHTML = `<img src="jokerimg.png" class="joker-img"><span class="joker-text">JOKER</span>`;
     } else {
-      front.innerText = card.value + card.suit;
+      // 값과 문양 표시
+      front.innerText = (card.value || card.rank) + card.suit;
     }
     
-    setCardColor(front, card.suit, card.value);
+    if (typeof setCardColor === 'function') {
+      setCardColor(front, card.suit, (card.value || card.rank));
+    }
     
     const back = document.createElement("div");
     back.className = "back";
@@ -211,12 +226,17 @@ function render() {
     inner.appendChild(back);
     wrap.appendChild(inner);
 
-    wrap.onclick = () => { if (phase === "draw") toggleHold(i, wrap); };
+    wrap.onclick = () => { 
+      if (typeof phase !== 'undefined' && phase === "draw") {
+        toggleHold(i, wrap); 
+      }
+    };
+
     container.appendChild(wrap);
 
     setTimeout(() => {
       inner.classList.remove("flip");
-      playFlip();
+      if (typeof playFlip === 'function') playFlip();
     }, i * 120 + 300);
   });
 }
@@ -235,6 +255,7 @@ function updateMoney() {
   document.getElementById("money").innerText = money.toLocaleString(); 
   localStorage.setItem('poker-money', money);
 }
+
 
 /* 🚀 게임 흐름 시작 */
 function startGame() {
@@ -319,7 +340,7 @@ function finishGame() {
     // 결과 텍스트 표시
     document.getElementById("result").innerText = `${t.ranks[rank]} (${win.toLocaleString()})`;
 
-    // 🔴 [핵심 조건] 배당이 2배 이상(투페어 이상)인 경우만 미니게임 진입
+    // 🔴 [핵심 조건] 배당이 1배 이상(투페어 이상)인 경우만 미니게임 진입
     if (payout[rank] >= 1) {
       miniValue = win; // 미니게임에서 불릴 금액 설정
       setTimeout(() => startMiniGame(), 1500); 
@@ -449,96 +470,128 @@ function getRandomValue() {
   return Math.floor(Math.random() * 13) + 1; 
 }
 
-/* 🃏 조커 포함 족보 판정 로직 (파이브 카드 추가 버전) */
 function checkHand(hand) {
+  // 1. 초기값 설정 (절대 undefined가 리턴되지 않게 함)
+  let resultText = "노페어";
+  window.winCards = []; 
+
+  if (!hand || hand.length === 0) return "노페어";
+
   const jokerCount = hand.filter(c => c.value === "JOKER").length;
   const normalCards = hand.filter(c => c.value !== "JOKER");
-  
-  const map = { A: 14, J: 11, Q: 12, K: 13 };
+  const map = { 'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 };
+
   const vals = normalCards.map(c => map[c.value] || parseInt(c.value)).sort((a, b) => a - b);
-  
   const counts = {};
   vals.forEach(v => counts[v] = (counts[v] || 0) + 1);
-  const countArr = Object.values(counts).sort((a, b) => b - a);
+  
+  const countEntries = Object.entries(counts).sort((a, b) => b[1] - a[1] || Number(b[0]) - Number(a[0]));
+  const countArr = countEntries.map(e => e[1]);
 
-  // 플러시 & 스트레이트 기본 판정 로직
-  const isFlush = new Set(normalCards.map(c => c.suit)).size <= 1;
+  const isFlush = normalCards.length > 5 ? false : (normalCards.length > 0 && new Set(normalCards.map(c => c.suit)).size === 1);
   const uniqueVals = [...new Set(vals)];
   let isStraight = false;
 
   if (jokerCount === 0) {
     isStraight = (uniqueVals.length === 5 && (vals[4] - vals[0] === 4)) || JSON.stringify(vals) === "[2,3,4,5,14]";
-  } else {
-    if (uniqueVals.length === 4) {
-      isStraight = (vals[3] - vals[0] <= 4);
-      const backStraightCheck = [[2,3,4,14], [2,3,5,14], [2,4,5,14], [3,4,5,14]];
-      if (backStraightCheck.some(arr => JSON.stringify(uniqueVals) === JSON.stringify(arr))) isStraight = true;
+  } else if (uniqueVals.length === 4) {
+    isStraight = (vals[3] - vals[0] <= 4) || [[2,3,4,14], [2,3,5,14], [2,4,5,14], [3,4,5,14]].some(arr => JSON.stringify(uniqueVals) === JSON.stringify(arr));
+  }
+
+  // 🏆 족보 판정 시작
+  if (jokerCount > 0 && (countArr[0] || 0) === 4) { 
+    window.winCards = [...hand]; resultText = "파이브 카드"; 
+  } else if (isStraight && isFlush) { 
+    window.winCards = [...hand]; resultText = (vals.includes(14) || jokerCount > 0) ? "로얄 스트레이트 플러시" : "스트레이트 플러시"; 
+  } else if ((countArr[0] || 0) + jokerCount >= 4) {
+    const targetVal = countEntries[0][0];
+    window.winCards = hand.filter(c => (map[c.value] || parseInt(c.value)) == targetVal || c.value === "JOKER");
+    resultText = "포카드";
+  } else if ((countArr[0] === 3 && countArr[1] === 2) || (jokerCount === 1 && countArr[0] === 2 && countArr[1] === 2)) {
+    window.winCards = [...hand]; resultText = "풀하우스";
+  } else if (isFlush) { 
+    window.winCards = [...hand]; resultText = "플러시"; 
+  } else if (isStraight) { 
+    window.winCards = [...hand]; resultText = "스트레이트"; 
+  } else if ((countArr[0] || 0) + jokerCount >= 3) {
+    const targetVal = countEntries[0][0];
+    window.winCards = hand.filter(c => (map[c.value] || parseInt(c.value)) == targetVal || c.value === "JOKER");
+    resultText = "트리플";
+  } else if (countArr.filter(v => v === 2).length === 2) {
+    const pairVals = countEntries.filter(e => e[1] === 2).map(e => e[0]);
+    window.winCards = hand.filter(c => pairVals.includes(String(map[c.value] || c.value)));
+    resultText = "투페어";
+  // ... (앞부분 생략)
+  } else if (jokerCount >= 1 || (countArr[0] && countArr[0] >= 2)) {
+    // 🔥 원페어 판정 구간 수정
+    let jokerCard = hand.find(c => c.value === "JOKER");
+    
+    if (jokerCount > 0 && jokerCard) {
+      // 조커가 포함된 원페어일 때
+      const sortedNormal = [...normalCards].sort((a, b) => (map[b.value] || parseInt(b.value)) - (map[a.value] || parseInt(a.value)));
+      const highest = sortedNormal[0];
+      const matchCard = hand.find(c => c.value === highest.value && c.suit === highest.suit && c !== jokerCard);
+      window.winCards = [jokerCard, matchCard || hand.find(c => c.value === highest.value)];
+      
+      // 🎯 (A)를 빼고 "원페어"만 입력
+      resultText = "원페어"; 
+    } else if (countArr[0] >= 2) {
+      // 일반 원페어일 때
+      const targetVal = countEntries[0][0]; 
+      window.winCards = hand.filter(c => (map[c.value] || parseInt(c.value)) == targetVal);
+      
+      // 🎯 여기도 "원페어"만 입력
+      resultText = "원페어"; 
     }
   }
 
-  // ========================================================
-  // 🏆 [중요] 족보 판정 시작 - 순서가 절대적으로 중요합니다!
-  // ========================================================
-
-  // 1. 파이브 카드 (조커 1장 + 나머지 4장이 동일 숫자)
-  // 조커가 있을 때, 가장 많은 숫자의 개수(countArr[0])가 4라면 5개가 완성됩니다.
-  if (jokerCount > 0 && countArr[0] === 4) {
-    return "파이브 카드"; 
-  }
-
-  // 2. 로얄 스트레이트 플러시
-  if (isStraight && isFlush && (vals.includes(14) || jokerCount > 0) && (vals[0] >= 10 || (jokerCount > 0 && vals[0] >= 9))) {
-    return "로얄 스트레이트 플러시";
-  }
-
-  // 3. 스트레이트 플러시
-  if (isStraight && isFlush) return "스트레이트 플러시";
-
-  // 4. 포카드 (조커 포함 4개)
-  if (countArr[0] + jokerCount >= 4) return "포카드";
-
-  // 5. 풀하우스
-  if ((countArr[0] === 3 && countArr[1] === 2) || (jokerCount === 1 && countArr[0] === 2 && countArr[1] === 2)) {
-    return "풀하우스";
-  }
-
-  // 6. 플러시
-  if (isFlush) return "플러시";
-
-  // 7. 스트레이트
-  if (isStraight) return "스트레이트";
-
-  // 8. 트리플
-  if (countArr[0] + jokerCount >= 3) return "트리플";
-
-  // 9. 투페어
-  if (countArr.filter(v => v === 2).length === 2) return "투페어";
-
-  // 10. 원페어
-  if (countArr[0] + jokerCount >= 2) return "원페어";
-
-  return "노페어";
+  // 🏁 마지막에 반환
+  if (typeof highlightRank === 'function') highlightRank(resultText);
+  return resultText; 
 }
 
+
+
 function highlightRank(rank) {
-  document.querySelectorAll("#payoutTable li").forEach(li => li.classList.remove("highlight"));
-  const el = document.getElementById(rank);
-  if (el) el.classList.add("highlight");
+  // 추가: rank가 문자열이 아니면(undefined 등) 바로 중단
+  if (typeof rank !== "string") return; 
+
+  document.querySelectorAll("#payoutTable li").forEach(li => {
+    li.classList.remove("highlight");
+  });
+
+  if (!rank || rank === "노페어") return;
+
+  let searchId = rank.split(" ")[0];
+
+  if (rank.includes("로얄")) searchId = "로얄 스트레이트 플러시";
+  if (rank.includes("스트레이트 플러시") && !rank.includes("로얄")) searchId = "스트레이트 플러시";
+
+  const el = document.getElementById(searchId);
+  if (el) {
+    el.classList.add("highlight");
+  }
 }
 
 function highlightCards() {
-  const cards = document.querySelectorAll("#cards .card");
-  const valMap = {};
-  hand.forEach((c, i) => { 
-    const v = c.value;
-    valMap[v] = valMap[v] || [];
-    valMap[v].push(i);
+  // 1. 기존 테두리 초기화
+  const cardElements = document.querySelectorAll("#cards .card");
+  cardElements.forEach(card => card.classList.remove("win-card"));
+
+  // 2. checkHand에서 저장한 winCards가 비어있지 않은지 확인
+  if (!winCards || winCards.length === 0) return;
+
+  // 3. 현재 화면의 카드(hand)와 당첨 카드(winCards)를 비교하여 테두리 추가
+  hand.forEach((cardObj, index) => {
+    // winCards 배열 안에 현재 카드 객체가 포함되어 있는지 확인
+    const isWinCard = winCards.some(winObj => 
+      winObj.value === cardObj.value && winObj.suit === cardObj.suit
+    );
+
+    if (isWinCard) {
+      cardElements[index].classList.add("win-card");
+    }
   });
-  // 조커는 무조건 강조, 페어 이상 숫자들도 강조
-  hand.forEach((c, i) => {
-    if (c.value === "JOKER") cards[i].classList.add("win-card");
-  });
-  Object.values(valMap).forEach(arr => { if (arr.length >= 2) arr.forEach(i => cards[i].classList.add("win-card")); });
 }
 
 function clearHighlight() { 

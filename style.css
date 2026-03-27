@@ -266,13 +266,16 @@ body.dark-theme .card.joker-card .front img.joker-img {
 
 
 .win-card.joker-card .front {
-    animation: jokerWinGlow 1.5s infinite alternate !important;
-    border: 2px solid #ff3b30 !important;
+
+    border: 2px solid #00ff88 !important; 
+  
+    animation: winGlow 1.5s infinite alternate !important; 
+    box-shadow: 0 0 20px #00ff88 !important;
 }
 
-@keyframes jokerWinGlow {
-    from { box-shadow: 0 0 15px #ff3b30; transform: scale(1.02); }
-    to { box-shadow: 0 0 35px #ff3b30, 0 0 15px #ffffff; transform: scale(1.08); }
+@keyframes winGlow {
+  from { box-shadow: 0 0 10px #00ff88; }
+  to { box-shadow: 0 0 25px #00ff88; }
 }
 
 /* 5. 다크 모드에서의 조커 스타일 최적화 (이미지 반전 안 함) */
