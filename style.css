@@ -129,70 +129,67 @@ h1 {
 
 /* =================== 배당표 (iOS 앱 카드 스타일) =================== */
 #payoutTable {
-  font-size: 1.05em; /* 폰트 크기 증대 (기존 0.85~0.9 -> 1.05) */
-  list-size: none;
-  padding: 8px 4px; /* 상하 여백 늘리고 좌우는 최소화 */
-  margin: 20px auto;
-  width: 96%;        /* 모바일에서 더 넓게 쓰도록 수정 */
-  max-width: 550px;  /* 최대 너비도 약간 확장 */
+  font-size: 1.05em; /* 글자 크기는 시원하게 유지 */
+  list-style: none;
+  padding: 6px; 
+  margin: 18px auto;
+  width: 96%;
+  max-width: 550px;
   
-  background: rgba(29, 43, 79, 0.7); /* 배경을 조금 더 진하게 해서 글씨 부각 */
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  background: rgba(29, 43, 79, 0.7);
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   border: 1px solid rgba(255, 255, 255, 0.15);
 
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* 왼쪽 열(글자 긴 쪽)을 약간 더 넓게 배분 */
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(5, auto);
   grid-auto-flow: column;
 }
 
 #payoutTable li {
-  padding: 12px 10px; /* 항목 간 간격을 넓혀서 시원하게 배치 */
+  /* [핵심] 상하 9px로 적당한 두께감 부여 */
+  padding: 9px 12px; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 600;    /* 글씨 두께를 조금 더 두껍게 */
+  font-weight: 600;
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  letter-spacing: -0.5px; /* 자간을 줄여서 글자가 잘 안 잘리게 함 */
+  
+  /* [추가] 너무 납작해지지 않도록 최소 높이 살짝 부여 */
+  min-height: 42px; 
+  box-sizing: border-box;
 }
 
-/* 족보 이름 스타일 */
+/* 이름 스타일 */
 #payoutTable li span:first-child {
-  white-space: nowrap;
-  margin-right: 5px;
+  white-space: normal; 
+  word-break: keep-all; 
+  line-height: 1.2; /* 줄 간격도 너무 붙지 않게 */
+  margin-right: 8px;
+  flex: 1;
+  text-align: left;
 }
 
-/* 배수(X배) 스타일 강조 */
+/* 배수 스타일 */
 #payoutTable li span:last-child {
-  color: #ffcc00; /* 배수 숫자에 금색 포인트를 주어 잘 보이게 함 */
-  font-variant-numeric: tabular-nums; /* 숫자 폭 일정하게 */
+  color: #ffcc00;
+  white-space: nowrap;
+  font-size: 0.9em;
+  flex-shrink: 0;
 }
 
-/* --- 순서 및 선 정리 --- */
-
-#payoutTable li:nth-child(-n+5) {
-  order: 2;
-  border-right: none;
-}
-
-#payoutTable li:nth-child(n+6) {
-  order: 1;
-  border-right: 1px solid rgba(255,255,255,0.15); /* 중앙 구분선 더 명확하게 */
-}
-
-#payoutTable li:nth-child(5),
-#payoutTable li:nth-child(10) {
-  border-bottom: none;
-}
+/* --- 순서 및 선 정리 (기존 유지) --- */
+#payoutTable li:nth-child(-n+5) { order: 2; border-right: none; }
+#payoutTable li:nth-child(n+6) { order: 1; border-right: 1px solid rgba(255,255,255,0.15); }
+#payoutTable li:nth-child(5), #payoutTable li:nth-child(10) { border-bottom: none; }
 
 #payoutTable li.highlight {
   color: #00ff88;
   font-weight: 900;
-  text-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
-  background: rgba(255, 255, 255, 0.05); /* 당첨 시 배경도 살짝 밝게 */
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  background: rgba(255, 255, 255, 0.1); /* 하이라이트 배경 조금 더 선명하게 */
 }
-
 /* =================== 카드 컨테이너 및 카드 (디자인 복원 완료) =================== */
 /* 카드 컨테이너 (모바일 한 줄 정렬 핵심) */
 .cards, .mini-cards {

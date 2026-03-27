@@ -51,7 +51,7 @@ const translations = {
     unit: "배"
   },
   en: { 
-    title: "Poker Game", money: "Balance", bet: "Bet", start: "Start", exchange: "Draw", payout: "Payout", 
+    title: "Poker Game", money: "funds", bet: "Bet", start: "Start", exchange: "Draw", payout: "Payout", 
     high: "High", low: "Low", cashout: "Cash Out", double: "Double Chance", win: "Win!", lose: "Lose", draw: "Draw",
     refill: "💰 Get 1 unit",
     bonusInfo: "(Get 500 points every hour)",
