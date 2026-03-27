@@ -2,13 +2,23 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
   text-align: center;
-  /* 아이폰 다크 모드 배경색 (고급스러운 네이비) */
   background: linear-gradient(135deg, #1d2b4f, #111a33);
   color: #ffffff;
   padding: 15px;
   margin: 0;
-  letter-spacing: -0.5px; /* iOS 특유의 쫀쫀한 자간 */
-  -webkit-font-smoothing: antialiased; /* 폰트 렌더링 최적화 */
+  letter-spacing: -0.5px;
+  -webkit-font-smoothing: antialiased;
+
+  /* 🚫 줌 방지 및 터치 최적화 추가 */
+  touch-action: pan-x pan-y; /* 기본 스크롤은 허용하되 줌은 제한 */
+  overflow-x: hidden;       /* 가로 스크롤 방지 */
+  overscroll-behavior: none; /* 당겨서 새로고침 방지 (몰입형 게임용) */
+}
+
+/* 모든 요소에서 터치 시 하이라이트 박스 제거 (iOS용) */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none; /* 꾹 눌러서 메뉴 뜨는 것 방지 */
 }
 
 h1 {
