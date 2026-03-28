@@ -35,6 +35,11 @@ const translations = {
     high: "높음", low: "낮음", cashout: "그만하기", double: "더블 찬스", win: "성공!", lose: "패배", draw: "무승부",
     refill: "❓ 게임 방법",
     bonusInfo: "(1시간마다 500포인트 자동 지급)",
+    miniQuery: "축하합니다!\n미니게임에 도전하시겠습니까?",
+    miniWin: "승리! 금액이 2배가 되었습니다.\n한 번 더 도전하시겠습니까?",
+    accept: "수락",
+    reject: "거절",
+    
     ranks: {
       "파이브 카드": "파이브 카드",
       "로얄 스트레이트 플러시": "로얄 스트레이트 플러시",
@@ -55,6 +60,11 @@ const translations = {
     high: "High", low: "Low", cashout: "Cash Out", double: "Double Chance", win: "Win!", lose: "Lose", draw: "Draw",
     refill: "❓ How to Play",
     bonusInfo: "(Get 500 points every hour)",
+    miniQuery: "Congratulations!\nWould you like to play the mini-game?",
+    miniWin: "Win! Your prize has doubled.\nTry again?",
+    accept: "Accept",
+    reject: "Decline",
+
     ranks: {
       "파이브 카드": "Five of a Kind",
       "로얄 스트레이트 플러시": "Royal Flush",
@@ -75,6 +85,11 @@ const translations = {
     high: "高い", low: "低い", cashout: "終了", double: "ダブルチャンス", win: "成功！", lose: "敗北", draw: "引き分け",
     refill: "❓ 遊び方",
     bonusInfo: "(1時間ごとに500ポイント自動支給)",
+    miniQuery: "おめでとうございます！\nミニゲームに挑戦しますか？",
+    miniWin: "勝利！賞金が2倍になりました。\nもう一度挑戦しますか？",
+    accept: "受諾",
+    reject: "拒否",
+
     ranks: {
       "파이브 카드": "ファイブカード",
       "로얄 스트레이트 플러시": "ロイヤルストレートフラッシュ",
@@ -111,12 +126,15 @@ const suits = ["♠", "♥", "♦", "♣"];
 const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 function convertValue(v) {
-  if (v === "A" || v === 1) return 14; 
-  if (v === "K" || v === 13) return 13;
-  if (v === "Q" || v === 12) return 12;
-  if (v === "J" || v === 11) return 11;
-  if (v === "JOKER") return 15; // 조커는 가장 높은 값으로 취급
-  return parseInt(v);
+  if (v === "JOKER") return 15;
+  if (v === "A" || v === 1 || v === "1") return 14; 
+  if (v === "K" || v === 13 || v === "13") return 13;
+  if (v === "Q" || v === 12 || v === "12") return 12;
+  if (v === "J" || v === 11 || v === "11") return 11;
+  
+  // 숫자인 경우 바로 반환, 문자열인 경우 숫자로 변환
+  const num = parseInt(v);
+  return isNaN(num) ? 0 : num; 
 }
 
 function createDeck() {
@@ -139,6 +157,7 @@ function setCardColor(el, suit, value) {
 }
 
 /* 🖥️ 화면 렌더링 & 언어 설정 */
+/* 🖥️ 화면 렌더링 & 언어 설정 */
 function changeLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
@@ -153,30 +172,50 @@ function changeLanguage(lang) {
   document.getElementById('ui-mini-title').innerText = t.double;
   document.getElementById('ui-high-btn').innerText = t.high;
   document.getElementById('ui-low-btn').innerText = t.low;
-  document.getElementById('ui-cashout-btn').innerText = t.cashout;
 
-  // 2. ⭐ [핵심 수정] 게임 방법 버튼의 텍스트를 변경합니다.
-  // HTML 버튼 안에 <span id="ui-refill-text"> 또는 <span id="ui-how-to-text">가 있어야 합니다.
-  const howToSpan = document.getElementById('ui-refill-text') || document.getElementById('ui-how-to-text');
-  if (howToSpan) {
-    // translations 객체에 정의한 refill(또는 howToPlay) 값을 가져옵니다.
-    howToSpan.innerText = t.refill; 
+  // 그만하기 버튼 처리 (존재할 경우에만)
+  const cashoutBtn = document.getElementById('ui-cashout-btn');
+  if (cashoutBtn) cashoutBtn.innerText = t.cashout;
+
+  // 2. 🔴 [핵심 추가] 현재 띄워진 수락/거절 창(Confirm UI) 실시간 번역
+  const confirmUI = document.getElementById("miniConfirmUI");
+  if (confirmUI && confirmUI.style.display === "block") {
+    const msgEl = document.getElementById("confirmMsg");
+    const accBtn = document.getElementById("acceptBtn");
+    const rejBtn = document.getElementById("rejectBtn");
+
+    // 상황 판단: 미니게임 승리 후 질문인지, 게임 종료 후 첫 질문인지 구분
+    // miniValue가 0보다 크면 '승리 후 재도전' 문구, 아니면 '첫 진입' 문구를 띄웁니다.
+    if (typeof miniValue !== 'undefined' && miniValue > 0) {
+      msgEl.innerText = `${t.miniWin}\n(${t.money}: ${miniValue.toLocaleString()})`;
+    } else {
+      msgEl.innerText = t.miniQuery;
+    }
+
+    // 버튼 텍스트 즉시 갱신
+    accBtn.innerText = t.accept;
+    rejBtn.innerText = t.reject;
   }
 
-  // 3. 보너스 안내 문구 변경
+  // 3. 게임 방법 버튼 및 보너스 문구 변경
+  const howToSpan = document.getElementById('ui-refill-text') || document.getElementById('ui-how-to-text');
+  if (howToSpan) howToSpan.innerText = t.refill; 
+
   const bonusInfoP = document.getElementById('ui-bonus-info');
   if (bonusInfoP) bonusInfoP.innerText = t.bonusInfo;
 
-  // 4. 배당표 재생성 (기존 코드 유지)
+  // 4. 배당표 재생성
   const payoutList = document.getElementById("payoutTable");
-  payoutList.innerHTML = "";
-  Object.keys(payout).forEach(rankName => {
-    if (rankName === "노페어") return;
-    const li = document.createElement("li");
-    li.id = rankName;
-    li.innerHTML = `<span>${t.ranks[rankName]}</span> <span>${payout[rankName]}${t.unit}</span>`;
-    payoutList.appendChild(li);
-  });
+  if (payoutList) {
+    payoutList.innerHTML = "";
+    Object.keys(payout).forEach(rankName => {
+      if (rankName === "노페어") return;
+      const li = document.createElement("li");
+      li.id = rankName;
+      li.innerHTML = `<span>${t.ranks[rankName]}</span> <span>${payout[rankName]}${t.unit}</span>`;
+      payoutList.appendChild(li);
+    });
+  }
 }
 
 function render() {
@@ -330,35 +369,43 @@ function exchange() {
 
 function finishGame() {
   const rank = checkHand(hand);
-  const bet = parseInt(document.getElementById("bet").value);
-  const win = payout[rank] * bet;
-  const t = translations[currentLang];
+  const betValue = parseInt(document.getElementById("bet").value);
+  const win = payout[rank] * betValue;
+  const t = translations[currentLang]; // 🌐 현재 언어셋 가져오기
   
   highlightRank(rank);
   highlightCards();
 
-  // 1. 당첨금이 있을 때 (원페어 이상)
   if (win > 0) {
-    rankSound.currentTime = 0; 
     rankSound.play();
     
-    // 결과 텍스트 표시
-    document.getElementById("result").innerText = `${t.ranks[rank]} (${win.toLocaleString()})`;
+    // 결과 텍스트 예: "원페어 (500) - 0.5배" (언어별 unit 적용)
+    document.getElementById("result").innerText = 
+      `${t.ranks[rank]} (${win.toLocaleString()}) - ${payout[rank]}${t.unit}`;
 
-    // 🔴 [핵심 조건] 배당이 1배 이상(투페어 이상)인 경우만 미니게임 진입
+    // 배당이 1배 이상일 때만 미니게임 제안 (원하는 기준에 따라 수정 가능)
     if (payout[rank] >= 1) {
-      miniValue = win; // 미니게임에서 불릴 금액 설정
-      setTimeout(() => startMiniGame(), 1500); 
-    } 
-    // 🟡 원페어(1배)인 경우 미니게임 없이 즉시 정산
-    else {
-      money += win; // 자산에 즉시 합산
+      miniValue = win; 
+      setTimeout(() => {
+        // ✅ [핵심 수정] 고정된 한글 대신 t.miniQuery를 사용합니다.
+        showCustomConfirm(
+          t.miniQuery, 
+          () => startMiniGame(), 
+          () => { 
+            money += win; 
+            updateMoney(); 
+            resetUI(); 
+          }
+        );
+      }, 1000);
+    } else {
+      // 1배 미만(예: 0.5배)은 바로 정산
+      money += win;
       updateMoney();
-      setTimeout(() => resetUI(), 1500); // 1.5초 후 다시 시작 버튼 활성화
+      setTimeout(() => resetUI(), 1500);
     }
-  } 
-  // 2. 꽝(노페어)일 때
-  else {
+  } else {
+    // 꽝(노페어)일 때
     document.getElementById("result").innerText = t.ranks[rank];
     resetUI();
   }
@@ -383,18 +430,27 @@ function startMiniGame() {
   document.getElementById("miniResult").innerText = translations[currentLang].money + ": " + miniValue.toLocaleString();
 }
 
+// 🔄 이 함수로 기존 guess를 교체하세요
+// 🔄 이 함수로 기존 guess를 교체하세요
 function guess(type) {
   if (miniLock) return;
-  miniLock = true;
+  miniLock = true; // 🔒 일단 잠금
+
   const newCard = getRandomValue();
   const leftInner = document.getElementById("leftCard").querySelector(".inner");
   const rightInner = document.getElementById("rightCard").querySelector(".inner");
   const resultText = document.getElementById("miniResult");
-  const t = translations[currentLang];
+  const t = translations[currentLang]; // 🌐 현재 언어셋
+
+  // 1. 왼쪽 카드(새 카드)를 오픈
   setMiniCard("leftCard", newCard, true);
+
+  // 2. 카드 오픈 애니메이션 시간을 기다린 후 판정 (0.5초 뒤)
   setTimeout(() => {
     const newV = convertValue(newCard);
     const baseV = convertValue(baseCard);
+
+    // [무승부 판정]
     if (newCard === baseCard) {
       resultText.innerText = t.draw;
       setTimeout(() => {
@@ -403,32 +459,91 @@ function guess(type) {
         setTimeout(() => {
           baseCard = getRandomValue();
           setMiniCard("rightCard", baseCard, true);
-          miniLock = false;
+          setMiniCard("leftCard", 0, false);
+          miniLock = false; // 🔓 잠금 해제
         }, 600);
       }, 800);
       return;
     }
+
+    // [승리 판정]
     if ((type === "high" && newV > baseV) || (type === "low" && newV < baseV)) {
       miniValue *= 2;
       playSound(winSoundSrc);
       resultText.innerText = t.win + " " + miniValue.toLocaleString();
+
       setTimeout(() => {
-        leftInner.classList.add("flip");
-        rightInner.classList.add("flip");
-        setTimeout(() => {
-          baseCard = newCard; 
-          setMiniCard("rightCard", baseCard, true);
-          setMiniCard("leftCard", 0, false);
-          miniLock = false;
-        }, 600);
-      }, 1500);
+        // ✅ [번역 수정] 고정된 한글 대신 t.miniWin 사용
+        showCustomConfirm(
+          `${t.miniWin}\n(${t.money}: ${miniValue.toLocaleString()})`, 
+          () => {
+            // ✅ 수락 시 로직
+            leftInner.classList.add("flip"); 
+            
+            setTimeout(() => {
+              baseCard = newCard;
+              setMiniCard("rightCard", baseCard, true); 
+              setMiniCard("leftCard", 0, false); 
+              
+              miniLock = false; 
+              // ✅ [번역 수정] t.money 활용
+              resultText.innerText = t.money + ": " + miniValue.toLocaleString();
+            }, 600);
+          },
+          () => {
+            // ✅ 거절 시 로직
+            money += miniValue;
+            updateMoney();
+            endMini();
+          }
+        );
+      }, 1000);
+
+    // [패배 판정]
     } else {
       playSound(loseSoundSrc);
       resultText.innerText = t.lose;
       miniValue = 0;
-      setTimeout(() => { endMini(); }, 2000);
+      setTimeout(() => {
+        endMini(); 
+      }, 2000);
     }
   }, 500);
+}
+
+function showCustomConfirm(message, onAccept, onReject) {
+  const ui = document.getElementById("miniConfirmUI");
+  const msgEl = document.getElementById("confirmMsg");
+  const accBtn = document.getElementById("acceptBtn");
+  const rejBtn = document.getElementById("rejectBtn");
+
+  if (!ui) return;
+
+  // 🌐 현재 언어 설정에 맞는 텍스트 가져오기
+  const t = translations[currentLang];
+
+  // 1. 메시지와 버튼 텍스트 설정
+  msgEl.innerText = message;
+  accBtn.innerText = t.accept; // translations 객체에 정의한 'accept' 사용
+  rejBtn.innerText = t.reject; // translations 객체에 정의한 'reject' 사용
+
+  ui.style.display = "block";
+
+  // 2. 이벤트 리스너 초기화 (중복 방지)
+  accBtn.onclick = null;
+  rejBtn.onclick = null;
+
+  // 3. 수락 버튼 클릭 시
+  accBtn.onclick = () => {
+    ui.style.display = "none"; 
+    if (typeof onAccept === "function") onAccept(); 
+  };
+  
+  // 4. 거절 버튼 클릭 시
+  rejBtn.onclick = () => {
+    ui.style.display = "none"; 
+    if (typeof onReject === "function") onReject(); 
+  };
 }
 
 
