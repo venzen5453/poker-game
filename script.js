@@ -33,7 +33,7 @@ const translations = {
   ko: { 
     title: "포커 게임", money: "자산", bet: "베팅액", start: "시작", exchange: "교환", payout: "배당표", 
     high: "높음", low: "낮음", cashout: "그만하기", double: "더블 찬스", win: "성공!", lose: "패배", draw: "무승부",
-    refill: "💰 1원 받기",
+    refill: "❓ 게임 방법",
     bonusInfo: "(1시간마다 500포인트 자동 지급)",
     ranks: {
       "파이브 카드": "파이브 카드",
@@ -53,7 +53,7 @@ const translations = {
   en: { 
     title: "Poker Game", money: "funds", bet: "Bet", start: "Start", exchange: "Draw", payout: "Payout", 
     high: "High", low: "Low", cashout: "Cash Out", double: "Double Chance", win: "Win!", lose: "Lose", draw: "Draw",
-    refill: "💰 Get 1 unit",
+    refill: "❓ How to Play",
     bonusInfo: "(Get 500 points every hour)",
     ranks: {
       "파이브 카드": "Five of a Kind",
@@ -73,7 +73,7 @@ const translations = {
   ja: { 
     title: "ポーカーゲーム", money: "資産", bet: "ベット", start: "スタート", exchange: "交換", payout: "配당표", 
     high: "高い", low: "低い", cashout: "終了", double: "ダブルチャンス", win: "成功！", lose: "敗北", draw: "引き分け",
-    refill: "💰 1円 ゲット",
+    refill: "❓ 遊び方",
     bonusInfo: "(1時間ごとに500ポイント自動支給)",
     ranks: {
       "파이브 카드": "ファイブカード",
@@ -143,7 +143,7 @@ function changeLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
   
-  // 기본 텍스트 변경
+  // 1. 기본 텍스트 변경
   document.getElementById('ui-title').innerText = t.title;
   document.getElementById('ui-money-label').innerText = t.money;
   document.getElementById('ui-bet-label').innerText = t.bet + ":";
@@ -155,14 +155,19 @@ function changeLanguage(lang) {
   document.getElementById('ui-low-btn').innerText = t.low;
   document.getElementById('ui-cashout-btn').innerText = t.cashout;
 
-  // ⭐ [중요] 1원 받기 버튼 & 보너스 문구 번역 추가
-  const refillSpan = document.getElementById('ui-refill-text');
+  // 2. ⭐ [핵심 수정] 게임 방법 버튼의 텍스트를 변경합니다.
+  // HTML 버튼 안에 <span id="ui-refill-text"> 또는 <span id="ui-how-to-text">가 있어야 합니다.
+  const howToSpan = document.getElementById('ui-refill-text') || document.getElementById('ui-how-to-text');
+  if (howToSpan) {
+    // translations 객체에 정의한 refill(또는 howToPlay) 값을 가져옵니다.
+    howToSpan.innerText = t.refill; 
+  }
+
+  // 3. 보너스 안내 문구 변경
   const bonusInfoP = document.getElementById('ui-bonus-info');
-  
-  if (refillSpan) refillSpan.innerText = t.refill;
   if (bonusInfoP) bonusInfoP.innerText = t.bonusInfo;
 
-  // 배당표 재생성
+  // 4. 배당표 재생성 (기존 코드 유지)
   const payoutList = document.getElementById("payoutTable");
   payoutList.innerHTML = "";
   Object.keys(payout).forEach(rankName => {
@@ -652,13 +657,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 페이지가 로드된 후 실행
 document.addEventListener("DOMContentLoaded", () => {
-  const refillBtn = document.getElementById("clickRefillBtn");
+  const howToBtn = document.getElementById("howToPlayBtn");
 
-  // 1. 클릭 시 1원 충전
-  if (refillBtn) {
-    refillBtn.onclick = () => {
-      money += 1;
-      updateMoney(); // 화면의 자산 표시를 갱신하는 함수
+  // 1. 클릭 시 게임 방법 안내
+  if (howToBtn) {
+    howToBtn.onclick = () => {
+      // 현재 선택된 언어 가져오기
+      const currentLang = document.getElementById('langSelect').value || 'ko';
+
+      // 상세 안내 메시지 (알림창용)
+      const messages = {
+  ko: "🃏 [ 포커 게임 방법 ]\n\n1. 베팅 금액 설정 후 [시작] 클릭\n2. 바꾸지 않을 카드를 선택(HOLD). 선택되지 않은 카드는 교체됩니다.\n3. [교환]을 클릭하여 카드 교체\n4. 족보 완성 시 당첨금 지급!\n\n💰 [더블 찬스]\n승리 시 도전! 다음 카드가 더 클지 작을지 맞춰보세요.",
+  
+  en: "🃏 [ How to Play ]\n\n1. Set your bet and click [Start].\n2. Select the cards you want to keep (HOLD). Unselected cards will be replaced.\n3. Click [Draw] to exchange cards.\n4. Get paid if you have a winning hand!\n\n💰 [Double Chance]\nChallenge after a win! Guess if the next card will be higher or lower.",
+  
+  ja: "🃏 [ 遊び方 ]\n\n1. ベット額を設定して [スタート] をクリック。\n2. 残したいカードを選択 (HOLD)。選択されていないカードが交換されます。\n3. [交換] をクリックしてカードを交換。\n4. 役が完成すれば配当獲得！\n\n💰 [ダブルチャンス]\n勝利時に挑戦！次のカードがより大きいか小さいか当ててみてください。"
+};
+
+      alert(messages[currentLang] || messages.ko);
     };
   }
 

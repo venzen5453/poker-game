@@ -662,18 +662,34 @@ body.dark-theme button {
 }
 
 
-#clickRefillBtn {
-  transition: transform 0.1s ease, background-color 0.2s;
+/* ✅ 게임 방법 버튼 전용 스타일 (새로 추가) */
+.how-to-btn {
+  font-size: 0.9em !important;
+  padding: 8px 18px !important;
+  margin: 10px auto !important;
+  border-radius: 20px !important;
+  
+  /* iOS 세컨더리 버튼 스타일: 반투명 화이트 */
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  
+  font-weight: 700 !important;
+  backdrop-filter: blur(10px); /* 배경 흐림 효과 */
+  -webkit-backdrop-filter: blur(10px);
+  
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  touch-action: manipulation;
 }
 
-#clickRefillBtn:hover {
-  background-color: #ffd633 !important; /* 마우스 올리면 더 밝게 */
+.how-to-btn:active {
+  transform: scale(0.94); /* 누를 때 살짝 작아짐 */
+  background: rgba(255, 255, 255, 0.25) !important;
 }
-
-#clickRefillBtn:active {
-  transform: scale(0.95); /* 누르는 순간 살짝 들어가는 효과 */
-}
-
 
 
 /* 🚫 게임 내 모든 클릭 요소 연타 시 확대 방지 */
