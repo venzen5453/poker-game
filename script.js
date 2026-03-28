@@ -816,33 +816,63 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const howToBtn = document.getElementById("howToPlayBtn");
 
-  // 1. 클릭 시 게임 방법 안내
+  // 1. 클릭 시 커스텀 게임 방법 안내창 표시
   if (howToBtn) {
     howToBtn.onclick = () => {
-      // 현재 선택된 언어 가져오기
-      const currentLang = document.getElementById('langSelect').value || 'ko';
+      // 커스텀 UI 엘리먼트 가져오기
+      const ui = document.getElementById("howToUI");
+      const title = document.getElementById("howToTitle");
+      const content = document.getElementById("howToContent");
+      const closeBtn = document.getElementById("howToCloseBtn");
 
-      // 상세 안내 메시지 (알림창용)
+      // 현재 선택된 언어 가져오기 (전역변수 currentLang 사용 권장)
+      const lang = (typeof currentLang !== 'undefined') ? currentLang : (document.getElementById('langSelect').value || 'ko');
+
+      // 상세 안내 데이터
       const messages = {
-  ko: "🃏 [ 포커 게임 방법 ]\n\n1. 베팅 금액 설정 후 [시작] 클릭\n2. 바꾸지 않을 카드를 선택(HOLD). 선택되지 않은 카드는 교체됩니다.\n3. [교환]을 클릭하여 카드 교체\n4. 족보 완성 시 당첨금 지급!\n\n💰 [더블 찬스]\n승리 시 도전! 다음 카드가 더 클지 작을지 맞춰보세요.",
-  
-  en: "🃏 [ How to Play ]\n\n1. Set your bet and click [Start].\n2. Select the cards you want to keep (HOLD). Unselected cards will be replaced.\n3. Click [Draw] to exchange cards.\n4. Get paid if you have a winning hand!\n\n💰 [Double Chance]\nChallenge after a win! Guess if the next card will be higher or lower.",
-  
-  ja: "🃏 [ 遊び方 ]\n\n1. ベット額を設定して [スタート] をクリック。\n2. 残したいカードを選択 (HOLD)。選択されていないカードが交換されます。\n3. [交換] をクリックしてカードを交換。\n4. 役が完成すれば配当獲得！\n\n💰 [ダブルチャンス]\n勝利時に挑戦！次のカードがより大きいか小さいか当ててみてください。"
-};
+        ko: {
+          title: "🃏 [ 포커 게임 방법 ]",
+          body: "1. 베팅 금액 설정 후 [시작] 클릭\n2. 바꾸지 않을 카드를 선택(HOLD). 선택되지 않은 카드는 교체됩니다.\n3. [교환]을 클릭하여 카드 교체\n4. 족보 완성 시 당첨금 지급!\n\n💰 [더블 찬스]\n승리 시 도전! 다음 카드가 더 클지 작을지 맞춰보세요.",
+          close: "닫기"
+        },
+        en: {
+          title: "🃏 [ How to Play ]",
+          body: "1. Set your bet and click [Start].\n2. Select the cards you want to keep (HOLD). Unselected cards will be replaced.\n3. Click [Draw] to exchange cards.\n4. Get paid if you have a winning hand!\n\n💰 [Double Chance]\nChallenge after a win! Guess if the next card will be higher or lower.",
+          close: "Close"
+        },
+        ja: {
+          title: "🃏 [ 遊び方 ]",
+          body: "1. ベット額を設定して [スタート] をクリック。\n2. 残したいカードを選択 (HOLD)。選択されていないカードが交換されます。\n3. [交換] をクリックしてカードを交換。\n4. 役が完成すれば配当獲得！\n\n💰 [ダブルチャンス]\n勝利時に挑戦！次のカードがより大きいか小さいか当ててみてください。",
+          close: "閉じる"
+        }
+      };
 
-      alert(messages[currentLang] || messages.ko);
+      const data = messages[lang] || messages.ko;
+
+      // 텍스트 반영 (\n을 <br>로 치환하여 줄바꿈 적용)
+      title.innerText = data.title;
+      content.innerHTML = data.body.replace(/\n/g, '<br>');
+      if (closeBtn) closeBtn.innerText = data.close;
+
+      // 팝업 표시
+      ui.style.display = "block";
+
+      // 닫기 버튼 기능
+      if (closeBtn) {
+        closeBtn.onclick = () => { ui.style.display = "none"; };
+      }
     };
   }
 
   // 2. 1시간(3600초)마다 500원 자동 충전
   setInterval(() => {
-    money += 500;
-    updateMoney();
-    // 콘솔에만 기록 (개발자 도구에서 확인 가능, 화면에는 안 보임)
-    console.log("🎁 Hourly bonus 500 added.");
-    
-  }, 3600 * 1000); // 3600초 * 1000ms
+    // 전역 money 변수가 선언되어 있어야 함
+    if (typeof money !== 'undefined') {
+      money += 500;
+      if (typeof updateMoney === 'function') updateMoney();
+      console.log("🎁 Hourly bonus 500 added.");
+    }
+  }, 3600 * 1000); 
 });
 
 // 핀치 줌(두 손가락) 방지
