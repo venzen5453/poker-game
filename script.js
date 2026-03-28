@@ -371,23 +371,25 @@ function finishGame() {
   const rank = checkHand(hand);
   const betValue = parseInt(document.getElementById("bet").value);
   const win = payout[rank] * betValue;
-  const t = translations[currentLang]; // 🌐 현재 언어셋 가져오기
+  const t = translations[currentLang]; 
   
   highlightRank(rank);
   highlightCards();
 
+  const resultEl = document.getElementById("result"); // 결과 엘리먼트 참조
+
   if (win > 0) {
     rankSound.play();
     
-    // 결과 텍스트 예: "원페어 (500) - 0.5배" (언어별 unit 적용)
-    document.getElementById("result").innerText = 
-      `${t.ranks[rank]} (${win.toLocaleString()}) - ${payout[rank]}${t.unit}`;
+    resultEl.innerText = `${t.ranks[rank]} (${win.toLocaleString()}) - ${payout[rank]}${t.unit}`;
 
-    // 배당이 1배 이상일 때만 미니게임 제안 (원하는 기준에 따라 수정 가능)
+    // ✅ [추가] 결과가 나오면 결과창 위치로 부드럽게 스크롤
+    // 'center'로 맞추면 결과창과 그 아래 뜰 팝업창이 화면 중앙에 오게 됩니다.
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
     if (payout[rank] >= 1) {
       miniValue = win; 
       setTimeout(() => {
-        // ✅ [핵심 수정] 고정된 한글 대신 t.miniQuery를 사용합니다.
         showCustomConfirm(
           t.miniQuery, 
           () => startMiniGame(), 
@@ -395,18 +397,24 @@ function finishGame() {
             money += win; 
             updateMoney(); 
             resetUI(); 
+            // ✅ [추가] 정산 후 다시 상단(카드 영역)으로 스크롤 이동
+            document.getElementById("cards").scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         );
       }, 1000);
     } else {
-      // 1배 미만(예: 0.5배)은 바로 정산
       money += win;
       updateMoney();
-      setTimeout(() => resetUI(), 1500);
+      setTimeout(() => {
+        resetUI();
+        // 0.5배 정산 후 다시 위로 이동
+        document.getElementById("cards").scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 1500);
     }
   } else {
-    // 꽝(노페어)일 때
-    document.getElementById("result").innerText = t.ranks[rank];
+    resultEl.innerText = t.ranks[rank];
+    // ✅ [추가] 패배 시에도 결과를 보여주기 위해 살짝 스크롤
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     resetUI();
   }
 }
@@ -422,15 +430,31 @@ function resetUI() {
 function startMiniGame() {
   phase = "mini";
   miniLock = false;
-  document.getElementById("miniGame").style.display = "block";
-  document.getElementById("gameArea").style.display = "none";
+  
+  const miniGameArea = document.getElementById("miniGame");
+  const gameArea = document.getElementById("gameArea");
+
+  // 1. 본게임 숨기고 미니게임 표시
+  miniGameArea.style.display = "block";
+  gameArea.style.display = "none";
+
+  // 2. 🔴 [핵심 수정] 0.05초 뒤에 스크롤 실행
+  // 브라우저가 요소를 렌더링할 시간을 주어 위치 계산 오류를 방지합니다.
+  setTimeout(() => {
+    miniGameArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+
+  // 3. 초기 카드 설정
   baseCard = getRandomValue();
   setMiniCard("rightCard", baseCard, true);
   setMiniCard("leftCard", 0, false);
-  document.getElementById("miniResult").innerText = translations[currentLang].money + ": " + miniValue.toLocaleString();
+
+  // 4. 현재 금액 표시 (번역 적용)
+  const t = translations[currentLang];
+  document.getElementById("miniResult").innerText = 
+    t.money + ": " + miniValue.toLocaleString();
 }
 
-// 🔄 이 함수로 기존 guess를 교체하세요
 // 🔄 이 함수로 기존 guess를 교체하세요
 function guess(type) {
   if (miniLock) return;
@@ -729,14 +753,32 @@ function cashOut() {
 
 function endMini() {
   phase = "idle";
-  document.getElementById("miniGame").style.display = "none";
-  document.getElementById("gameArea").style.display = "block";
+  
+  const miniGameArea = document.getElementById("miniGame");
+  const gameArea = document.getElementById("gameArea");
+
+  // 1. 미니게임 숨기고 본게임 표시
+  miniGameArea.style.display = "none";
+  gameArea.style.display = "block";
+
+  // ✅ [추가] 본게임 영역(카드판) 시작 지점으로 화면을 부드럽게 올립니다.
+  // block: 'start'를 사용하면 상단 타이틀이나 카드 부분이 화면 맨 위로 오게 됩니다.
+  gameArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // 2. UI 버튼 및 상태 초기화
   document.getElementById("startBtn").style.display = "inline-block";
   document.getElementById("exchangeBtn").style.display = "none";
+  
   clearHighlight();
   document.getElementById("bet").disabled = false;
+  
+  // 3. 미니게임 금액 초기화 및 자산 업데이트
   miniValue = 0;
   updateMoney();
+
+  // 4. 결과 텍스트 초기화 (다음 판을 위해 깔끔하게 비움)
+  document.getElementById("result").innerText = "";
+  document.getElementById("miniResult").innerText = "";
 }
 
 function toggleDarkMode() {
