@@ -21,16 +21,25 @@ const rankSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2000/20
 
 function playFlip() {
   const s = new Audio(flipSoundSrc);
-  // 🔴 고정값 대신 전역 볼륨 적용 (0.3 비율을 유지하고 싶다면 globalVolume * 0.6)
-  s.volume = globalVolume * 0.6; 
-  s.play();
+  // 카드 뒤집는 소리는 전역 볼륨 그대로(1.0 비율) 출력하여 최대한 키웁니다.
+  s.volume = globalVolume * 1.0; 
+  s.play().catch(() => {}); // 브라우저 정책 방어
 }
 
-function playSound(src, vol = 0.5) {
+// 2. 승리/패배 등 기타 효과음 (깜짝 놀라지 않게 비중 낮춤)
+function playSound(src, vol = 1.0) {
   const s = new Audio(src);
-  // 🔴 설정된 전역 볼륨 적용
-  s.volume = globalVolume; 
-  s.play();
+  // 일반 효과음은 전역 볼륨의 40%~50% 수준으로 낮춰서 재생합니다.
+  // (src가 winSoundSrc거나 loseSoundSrc일 때 적용됨)
+  s.volume = globalVolume * 0.45; 
+  s.play().catch(() => {});
+}
+
+// 3. 족보 완성 소리 (미니게임 진입 등)
+function playRankSound() {
+  // 족보 완성 소리도 너무 크지 않게 50% 수준으로 조절
+  rankSound.volume = globalVolume * 0.5;
+  rankSound.play().catch(() => {});
 }
 
 /* 🌐 다언어 데이터 */
@@ -987,14 +996,20 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // 6. 볼륨 조절 슬라이더
-  volumeControl.oninput = (e) => {
-    e.stopPropagation();
-    const val = e.target.value;
-    volValueDisplay.innerText = val + "%";
-    globalVolume = val / 100;
-    if (typeof rankSound !== 'undefined') rankSound.volume = globalVolume;
-  };
+// 6. 볼륨 조절 슬라이더
+volumeControl.oninput = (e) => {
+  e.stopPropagation();
+  const val = e.target.value;
+  volValueDisplay.innerText = val + "%";
+  
+  // 전역 볼륨 갱신 (0.0 ~ 1.0)
+  globalVolume = val / 100;
+  
+  // [수정] 족보 소리(rankSound)는 너무 크지 않게 전역 볼륨의 50%만 적용
+  if (typeof rankSound !== 'undefined') {
+    rankSound.volume = globalVolume * 0.5;
+  }
+};
 
   // 초기 상태 로드
   if (localStorage.getItem('poker-darkmode') === 'true') {
