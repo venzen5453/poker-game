@@ -499,93 +499,111 @@ button:hover, button:active {
   .button-group { gap: 10px; }
 }
 
-/* =================== 설정 바 (오른쪽 상단 - iOS 플로팅 스타일) =================== */
-/* 설정 바 및 버튼 분리 배치 */
-.settings-bar {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between; /* 양 끝으로 벌림 */
-  padding: 0 15px;
-  pointer-events: none; /* 클릭 방해 금지 */
-  z-index: 1000;
+/* =================== 설정 메뉴 (⚙️ 톱니바퀴 스타일) =================== */
+
+/* 1. 겉에 보이는 톱니바퀴 버튼 (우측 상단 고정) */
+.settings-wrapper {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 10002;
 }
 
-#langSelect, #themeToggle {
-  pointer-events: auto; /* 버튼만 다시 클릭 가능하게 */
-}
+#settingsOpenBtn {
+  width: fit-content !important;
+  min-width: 0 !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  border-radius: 20px !important;
 
-/* 언어 선택창 (왼쪽 상단 고정) */
-#langSelect {
-  background: rgba(255, 255, 255, 0.15); 
+  display: inline-flex !important;
+  align-items: center; /* 기본적인 수직 중앙 정렬 */
+  justify-content: center;
+  gap: 4px !important;
+
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  padding: 12px 18px; 
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 700;
-  backdrop-filter: blur(15px);
-
-}
-#langSelect:focus {
-  outline: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 하얀 테두리 대신 살짝 밝아지는 효과 */
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* 은은한 광채 효과 */
-}
-
-/* 다크모드 버튼 (오른쪽 상단 고정) */
-#themeToggle {
-  min-width: 54px !important;
-  width: 54px;
-  height: 54px;
-  border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
-
-/* ❗ 핵심: 드롭다운 목록(option) 스타일 강제 지정 */
-#langSelect option {
-  background-color: #1c1c1e; /* iOS 다크모드 배경색으로 고정 */
-  color: #ffffff; /* 글자색 흰색으로 고정 */
-  padding: 10px;
-  font-size: 1rem;
-}
-
-/* 다크모드일 때 언어 선택창 배경 최적화 */
-body.dark-theme #langSelect {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* 다크모드 토글 버튼: 더 크고 직관적으로 */
-#themeToggle {
-  min-width: 54px !important;
-  width: 54px;
-  height: 54px;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 16px !important; /* 원형에서 둥근 사각형으로 변경 (최신 iOS 트렌드) */
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem; /* 아이콘 크기 대폭 증대 */
   cursor: pointer;
-  backdrop-filter: blur(15px);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
 }
 
-/* 버튼 클릭 시 눌리는 효과 (Touch Feedback) */
-#langSelect:active, #themeToggle:active {
-  transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.3) !important;
+#settingsOpenBtn .icon {
+  font-size: 1.2rem !important; /* 글자 크기에 맞춰 살짝 조절 */
+  display: flex;
+  align-items: center;
+}
+
+#settingsOpenBtn .text {
+  font-size: 1.1rem !important; /* 1.3에서 살짝 줄여야 캡슐에 꽉 찹니다 */
+  font-weight: bold;
+  white-space: nowrap;
+  
+  /* 🔵 글자가 아래로 처질 때 해결책 */
+  display: inline-block;
+  transform: translateY(-1.5px); /* 👈 마이너스 값을 주어 위로 살짝 올림 */
+  /* 또는 margin-bottom: 2px; 처럼 아래에 여백을 주어 밀어올릴 수도 있습니다. */
+}
+
+#settingsOpenBtn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+#settingsOpenBtn:hover .icon {
+  transform: rotate(45deg); /* 살짝 회전 */
+  transition: transform 0.3s ease;
+}
+
+/* 2. 설정 창(settingsUI) 내부 요소 스타일 */
+/* 기존의 langSelect, themeToggle 설정을 팝업 내부용으로 한정함 */
+
+#settingsUI select#langSelect {
+  width: 100%;
+  padding: 12px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-top: 5px;
+  outline: none;
+}
+
+#settingsUI #themeToggle {
+  /* 팝업 내부 버튼은 둥근 사각형 스타일 유지 */
+  min-width: 60px !important;
+  width: auto !important;
+  height: 40px !important;
+  padding: 0 15px !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: white;
+}
+
+/* 드롭다운 옵션 스타일 */
+#langSelect option {
+  background-color: #1c1c1e;
+  color: #ffffff;
+  padding: 10px;
+}
+
+/* 소리 조절 슬라이더 디자인 */
+#volumeControl {
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: #444;
+  outline: none;
+  accent-color: #4a90e2; /* 슬라이더 포인트 컬러 */
 }
 
 /* =================== 다크 모드 (완전한 블랙 & 고대비) =================== */

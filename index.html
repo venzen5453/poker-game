@@ -8,13 +8,39 @@
 </head>
 <body>
 
-<div class="settings-bar">
-  <select id="langSelect" onchange="changeLanguage(this.value)">
-    <option value="ko">🇰🇷 KO</option>
-    <option value="en">🇺🇸 EN</option>
-    <option value="ja">🇯🇵 JA</option>
-  </select>
-  <button id="themeToggle" onclick="toggleDarkMode()">🌙</button>
+<div class="settings-wrapper">
+  <button id="settingsOpenBtn">
+    <span class="icon">⚙️</span>
+    <span class="text" id="ui-options-text">옵션</span>
+  </button>
+</div>
+
+<div id="settingsUI" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 2px solid #4a90e2; padding: 25px; z-index: 10003; text-align: center; color: white; border-radius: 20px; width: 85%; max-width: 320px; box-shadow: 0 0 50px rgba(0,0,0,0.9);">
+  <h2 id="ui-settings-title" style="margin-bottom: 20px; color: #4a90e2; font-size: 1.4rem;">⚙️ 설정</h2>
+
+  <div style="margin-bottom: 20px; text-align: left;">
+    <label id="ui-lang-label" style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #888;">언어 설정 (Language)</label>
+    <select id="langSelect" onchange="changeLanguage(this.value)" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 10px; font-size: 1rem;">
+      <option value="ko">🇰🇷 한국어 (KO)</option>
+      <option value="en">🇺🇸 English (EN)</option>
+      <option value="ja">🇯🇵 日本語 (JA)</option>
+    </select>
+  </div>
+
+  <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <span id="ui-theme-label" style="font-size: 1rem;">테마 설정 (Dark/Light)</span>
+    <button id="themeToggle" style="padding: 10px 20px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 10px; cursor: pointer;">🌙</button>
+  </div>
+
+  <div style="margin-bottom: 30px; text-align: left;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <span id="ui-vol-label" style="font-size: 1rem;">소리 크기 (Volume)</span>
+      <span id="volValue">50%</span>
+    </div>
+    <input type="range" id="volumeControl" min="0" max="100" value="50" style="width: 100%; cursor: pointer; accent-color: #4a90e2;">
+  </div>
+
+  <button id="settingsCloseBtn" style="padding: 14px 0; background: #4a90e2; color: white; border: none; cursor: pointer; border-radius: 12px; font-weight: bold; width: 100%; font-size: 1.1rem;">저장 및 닫기</button>
 </div>
 
 <div class="game-container">
@@ -70,14 +96,62 @@
     </div>
   </div>
 
-<div id="howToUI" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid #4a90e2; padding: 25px; z-index: 10001; text-align: center; color: white; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 0 50px rgba(0,0,0,0.9);">
+<div id="howToUI" style="
+    display: none; 
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    background: #1a1a1a; 
+    border: 3px solid #4a90e2; 
+    padding: 20px; 
+    z-index: 10001; 
+    text-align: center; 
+    color: white; 
+    border-radius: 20px; 
+    width: 85%; 
+    max-width: 340px; 
+    box-shadow: 0 0 50px rgba(0,0,0,0.9);
+">
   
-  <h2 id="howToTitle" style="margin-bottom: 20px; color: #4a90e2; font-size: 1.6rem; font-weight: bold;"></h2>
+  <h2 id="howToTitle" style="
+      margin: 10px 0 20px 0; 
+      color: #4a90e2; 
+      font-size: 1.4rem; 
+      font-weight: bold; 
+      transform: rotate(-3deg); 
+      display: inline-block;
+  "></h2>
   
-  <div id="howToContent" style="text-align: left; line-height: 1.8; font-size: 1.15rem; margin-bottom: 25px; background: #2a2a2a; padding: 20px; border-radius: 10px; max-height: 350px; overflow-y: auto; border: 1px solid #333;">
+  <div id="howToContent" style="
+      text-align: left; 
+      line-height: 1.7; 
+      font-size: 1.05rem; 
+      margin-bottom: 25px; 
+      background: #252525; 
+      padding: 15px 20px; 
+      border-radius: 12px; 
+      max-height: 280px; 
+      overflow-y: auto; 
+      border: 1px solid #333;
+  ">
   </div>
   
-  <button id="howToCloseBtn" style="padding: 15px 40px; background: #4a90e2; color: white; border: none; cursor: pointer; border-radius: 8px; font-weight: bold; width: 100%; font-size: 1.2rem;">닫기</button>
+  <button id="howToCloseBtn" style="
+    display: block;          /* 블록 요소로 변경 */
+    margin: 20px auto 5px;   /* 위쪽 20px 여백, 좌우 auto로 '중앙 정렬', 아래 5px */
+    padding: 13px 0; 
+    background: #4a90e2; 
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+    border-radius: 10px; 
+    font-weight: bold; 
+    width: 90%;              /* 창 너비의 90%만 차지하게 해서 좌우 여백 생성 */
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: background 0.2s;
+">닫기</button>
 </div>
 
   <section id="miniGame" class="mini-game" style="display:none;">

@@ -4,6 +4,9 @@ let deck = [], hand = [], selected = [];
 // 💾 1. 로컬 스토리지에서 저장된 돈 불러오기 (없으면 3,000원 시작)
 let money = parseInt(localStorage.getItem('poker-money')) || 3000; 
 
+// 🔊 [추가] 전역 볼륨 변수 (기본값 0.5)
+let globalVolume = 0.5;
+
 let phase = "idle"; // idle, starting, draw, exchanging, mini
 let miniValue = 0;
 let baseCard = 0;
@@ -18,13 +21,15 @@ const rankSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2000/20
 
 function playFlip() {
   const s = new Audio(flipSoundSrc);
-  s.volume = 0.3;
+  // 🔴 고정값 대신 전역 볼륨 적용 (0.3 비율을 유지하고 싶다면 globalVolume * 0.6)
+  s.volume = globalVolume * 0.6; 
   s.play();
 }
 
 function playSound(src, vol = 0.5) {
   const s = new Audio(src);
-  s.volume = vol;
+  // 🔴 설정된 전역 볼륨 적용
+  s.volume = globalVolume; 
   s.play();
 }
 
@@ -35,6 +40,11 @@ const translations = {
     high: "높음", low: "낮음", cashout: "그만하기", double: "더블 찬스", win: "성공!", lose: "패배", draw: "무승부",
     refill: "❓ 게임 방법",
     bonusInfo: "(1시간마다 500포인트 자동 지급)",
+    options: "옵션",
+    langLabel: "언어 설정 (Language)",
+    themeLabel: "테마 설정 (Dark/Light)",
+    volLabel: "소리 크기 (Volume)",
+    saveClose: "저장 및 닫기",
     miniQuery: "축하합니다!\n미니게임에 도전하시겠습니까?",
     miniWin: "승리! 금액이 2배가 되었습니다.\n한 번 더 도전하시겠습니까?",
     accept: "수락",
@@ -60,6 +70,11 @@ const translations = {
     high: "High", low: "Low", cashout: "Cash Out", double: "Double Chance", win: "Win!", lose: "Lose", draw: "Draw",
     refill: "❓ How to Play",
     bonusInfo: "(Get 500 points every hour)",
+    options: "Settings",
+    langLabel: "Language Settings",
+    themeLabel: "Theme (Dark/Light)",
+    volLabel: "Volume",
+    saveClose: "Save & Close",
     miniQuery: "Congratulations!\nWould you like to play the mini-game?",
     miniWin: "Win! Your prize has doubled.\nTry again?",
     accept: "Accept",
@@ -85,6 +100,11 @@ const translations = {
     high: "高い", low: "低い", cashout: "終了", double: "ダブルチャンス", win: "成功！", lose: "敗北", draw: "引き分け",
     refill: "❓ 遊び方",
     bonusInfo: "(1時間ごとに500ポイント自動支給)",
+    options: "オプション",
+    langLabel: "言語設定 (Language)",
+    themeLabel: "テーマ設定 (Dark/Light)",
+    volLabel: "音量 (Volume)",
+    saveClose: "保存して閉じる",
     miniQuery: "おめでとうございます！\nミニゲームに挑戦しますか？",
     miniWin: "勝利！賞金が2倍になりました。\nもう一度挑戦しますか？",
     accept: "受諾",
@@ -157,12 +177,32 @@ function setCardColor(el, suit, value) {
 }
 
 /* 🖥️ 화면 렌더링 & 언어 설정 */
-/* 🖥️ 화면 렌더링 & 언어 설정 */
 function changeLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
   
-  // 1. 기본 텍스트 변경
+  // 1. 설정창 및 상단 옵션 텍스트 변경
+  if (document.getElementById('ui-options-text')) 
+      document.getElementById('ui-options-text').innerText = t.options;
+  
+  if (document.getElementById('ui-settings-title')) 
+      document.getElementById('ui-settings-title').innerText = "⚙️ " + t.options;
+
+  // 🔴 요청하신 3종 세트 (언어, 테마, 소리)
+  if (document.getElementById('ui-lang-label')) 
+      document.getElementById('ui-lang-label').innerText = t.langLabel;
+  
+  if (document.getElementById('ui-theme-label')) 
+      document.getElementById('ui-theme-label').innerText = t.themeLabel;
+  
+  if (document.getElementById('ui-vol-label')) 
+      document.getElementById('ui-vol-label').innerText = t.volLabel;
+
+  // 저장 버튼
+  if (document.getElementById('settingsCloseBtn')) 
+      document.getElementById('settingsCloseBtn').innerText = t.saveClose;
+
+  // 2. 기본 게임 텍스트 변경
   document.getElementById('ui-title').innerText = t.title;
   document.getElementById('ui-money-label').innerText = t.money;
   document.getElementById('ui-bet-label').innerText = t.bet + ":";
@@ -177,25 +217,23 @@ function changeLanguage(lang) {
   const cashoutBtn = document.getElementById('ui-cashout-btn');
   if (cashoutBtn) cashoutBtn.innerText = t.cashout;
 
-  // 2. 🔴 [핵심 추가] 현재 띄워진 수락/거절 창(Confirm UI) 실시간 번역
+  // 3. 🔴 [Confirm UI] 실시간 번역
   const confirmUI = document.getElementById("miniConfirmUI");
   if (confirmUI && confirmUI.style.display === "block") {
     const msgEl = document.getElementById("confirmMsg");
     const accBtn = document.getElementById("acceptBtn");
     const rejBtn = document.getElementById("rejectBtn");
 
-    // 상황 판단: 미니게임 승리 후 질문인지, 게임 종료 후 첫 질문인지 구분
-    // miniValue가 0보다 크면 '승리 후 재도전' 문구, 아니면 '첫 진입' 문구를 띄웁니다.
     if (typeof miniValue !== 'undefined' && miniValue > 0) {
       msgEl.innerText = `${t.miniWin}\n(${t.money}: ${miniValue.toLocaleString()})`;
     } else {
       msgEl.innerText = t.miniQuery;
     }
 
-    // 버튼 텍스트 즉시 갱신
     accBtn.innerText = t.accept;
     rejBtn.innerText = t.reject;
   }
+
 
   // 3. 게임 방법 버튼 및 보너스 문구 변경
   const howToSpan = document.getElementById('ui-refill-text') || document.getElementById('ui-how-to-text');
@@ -789,17 +827,22 @@ function toggleDarkMode() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const betSelect = document.getElementById("bet");
+
+  // 💰 숫자를 '조', '억', '만' 단위로 변환하는 함수
   function formatBetText(num) {
+    if (num >= 1000000000000) return (num / 1000000000000) + "조";
     if (num >= 100000000) return (num / 100000000) + "억";
     if (num >= 10000) return (num / 10000) + "만";
     return num.toLocaleString();
   }
-  for (let amt = 10; amt <= 100000000; amt *= 10) {
+
+  for (let amt = 10; amt <= 1000000000000000; amt *= 10) {
     const opt = document.createElement("option");
     opt.value = amt;
     opt.innerText = formatBetText(amt);
     betSelect.appendChild(opt);
   }
+  
   betSelect.value = 10; 
   if (localStorage.getItem('poker-darkmode') === 'true') {
     document.body.classList.add('dark-theme');
@@ -891,3 +934,73 @@ document.addEventListener('touchend', function (event) {
   }
   lastTouchEnd = now;
 }, false);
+
+/* =================== ⚙️ 설정창 및 시스템 제어 =================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const settingsBtn = document.getElementById("settingsOpenBtn");
+  const settingsUI = document.getElementById("settingsUI");
+  const settingsCloseBtn = document.getElementById("settingsCloseBtn");
+  const volumeControl = document.getElementById("volumeControl");
+  const volValueDisplay = document.getElementById("volValue");
+  const themeToggle = document.getElementById("themeToggle");
+  const langSelect = document.getElementById("langSelect");
+
+  // 1. 설정창 열기
+  settingsBtn.onclick = (e) => {
+    e.stopPropagation();
+    settingsUI.style.display = "block";
+  };
+
+  // 2. 저장 및 닫기 버튼 (X 버튼)
+  settingsCloseBtn.onclick = (e) => {
+    e.stopPropagation();
+    settingsUI.style.display = "none";
+  };
+
+  // 3. 🔥 [핵심] 배경(바닥)을 눌렀을 때만 닫기 판정
+  settingsUI.onclick = (e) => {
+    // e.target은 실제로 클릭된 요소입니다.
+    // 클릭된 녀석이 settingsUI(배경 레이어) 본체일 때만 창을 닫습니다.
+    if (e.target === settingsUI) {
+      settingsUI.style.display = "none";
+    }
+  };
+
+  // 4. 내부 요소들(슬라이더, 버튼 등) 클릭 시 배경으로 신호 안 가게 막기
+  // 이렇게 하면 박스 안의 글자나 여백을 눌러도 배경 클릭으로 인식되지 않습니다.
+  [langSelect, themeToggle, volumeControl].forEach(el => {
+    if (el) {
+      el.onclick = (e) => e.stopPropagation();
+    }
+  });
+
+  // 5. 다크모드 버튼 기능 (별도 함수 호출 대신 여기서 직접 처리)
+  if (themeToggle) {
+    themeToggle.onclick = (e) => {
+      e.stopPropagation(); // 닫힘 방지
+      const isDark = document.body.classList.toggle('dark-theme');
+      themeToggle.innerText = isDark ? "☀️" : "🌙";
+      localStorage.setItem('poker-darkmode', isDark);
+    };
+  }
+
+  // 6. 볼륨 조절 슬라이더
+  volumeControl.oninput = (e) => {
+    e.stopPropagation();
+    const val = e.target.value;
+    volValueDisplay.innerText = val + "%";
+    globalVolume = val / 100;
+    if (typeof rankSound !== 'undefined') rankSound.volume = globalVolume;
+  };
+
+  // 초기 상태 로드
+  if (localStorage.getItem('poker-darkmode') === 'true') {
+    document.body.classList.add('dark-theme');
+    if(themeToggle) themeToggle.innerText = "☀️";
+  }
+  
+  // 기타 게임 초기화
+  updateMoney();
+  document.getElementById("startBtn").onclick = startGame;
+  document.getElementById("exchangeBtn").onclick = exchange;
+});
