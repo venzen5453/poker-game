@@ -124,7 +124,7 @@ const translations = {
 
     ranks: {
       "파이브 카드": "ファイ브카드",
-      "로얄 스트레이트 플러시": "ロイヤルストレートフラッシュ",
+      "로얄 스트레이트 플러시": "ロイヤルストレート<br>フラッシュ",
       "스트레이트 플러시": "ストレートフラッシュ",
       "포카드": "フォーカード",
       "풀하우스": "フルハウス",
@@ -357,7 +357,7 @@ function startGame() {
   const betSelect = document.getElementById("bet");
   const bet = parseInt(betSelect.value);
   if (money < bet) { alert(currentLang === 'ko' ? "잔액이 부족합니다." : "Insufficient funds."); return; }
-  phase = "starting"; 
+  phase = "starting";
   betSelect.disabled = true;
   money -= bet;
   updateMoney();
@@ -696,7 +696,22 @@ function checkHand(hand) {
   if (jokerCount > 0 && (countArr[0] || 0) === 4) { 
     window.winCards = [...hand]; resultText = "파이브 카드"; 
   } else if (isStraight && isFlush) { 
-    window.winCards = [...hand]; resultText = (vals.includes(14) || jokerCount > 0) ? "로얄 스트레이트 플러시" : "스트레이트 플러시"; 
+    window.winCards = [...hand]; 
+    
+    // --- 🔍 로얄 스트레이트 플러시 정밀 검사 시작 ---
+    // 로얄에 필요한 숫자들 (10, J, Q, K, A)
+    const royalValues = [10, 11, 12, 13, 14];
+    
+    // 현재 내 손패(조커 제외)에 로얄 숫자가 몇 개 있는지 확인
+    const countRoyalInHand = uniqueVals.filter(v => royalValues.includes(v)).length;
+    
+    // (내가 가진 로얄 숫자 개수 + 조커 개수)가 5개여야 로얄로 인정
+    if (countRoyalInHand + jokerCount >= 5) {
+      resultText = "로얄 스트레이트 플러시";
+    } else {
+      resultText = "스트레이트 플러시";
+    }
+    
   } else if ((countArr[0] || 0) + jokerCount >= 4) {
     const targetVal = countEntries[0][0];
     window.winCards = hand.filter(c => (map[c.value] || parseInt(c.value)) == targetVal || c.value === "JOKER");

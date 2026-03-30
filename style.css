@@ -503,7 +503,7 @@ button:hover, button:active {
 
 /* 1. 겉에 보이는 톱니바퀴 버튼 (우측 상단 고정) */
 .settings-wrapper {
-  position: fixed;
+  position: absolute;  /* 📌 fixed(화면고정)에서 absolute(문서고정)로 변경 */
   top: 15px;
   right: 15px;
   z-index: 10002;
