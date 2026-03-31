@@ -82,7 +82,7 @@ h1 {
   
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   min-width: 130px; 
 }
 
@@ -102,11 +102,12 @@ h1 {
 
 
 
-/* 선택된 카드(HOLD) 스타일 */
+/* [유지] HOLD 텍스트 위치 미세 조정 */
 .card.selected::after {
     content: "HOLD";
     position: absolute;
-    top: -10px;
+    /* 카드가 많이 올라가므로 텍스트 위치를 조금 더 위로 조정 */
+    top: -15px; 
     left: 50%;
     transform: translateX(-50%);
     background: #ffcc00;
@@ -115,7 +116,7 @@ h1 {
     font-weight: bold;
     font-size: 12px;
     border-radius: 4px;
-    z-index: 10;
+    z-index: 11; /* inner보다 위에 */
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
@@ -123,6 +124,8 @@ h1 {
 .card.selected .inner {
     outline: 3px solid #ffcc00;
     border-radius: 8px;
+    /* ✅ [추가] 올라갔을 때 그림자를 더 크고 흐리게 만들어 붕 뜬 느낌 강조 */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.7);
 }
 
 
@@ -203,17 +206,31 @@ h1 {
 }
 
 .card {
-    width: 17vw !important; /* 5장이 한 화면에 들어오는 너비 */
+    width: 17vw !important;
     max-width: 80px;
     height: 25vw !important;
     max-height: 120px;
-    flex-shrink: 0 !important; /* 공간 부족해도 카드 안 찌그러지게 */
+    flex-shrink: 0 !important;
     perspective: 1000px;
     cursor: pointer;
     border-radius: 12px;
     position: relative;
     user-select: none;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* ✅ [최적화] cubic-bezier를 조절하여 올라갈 때 살짝 튕기는 탄력감(Back ease-out)을 부여하고 속도를 0.3초로 변경 */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    
+    /* ✅ [필수] 이동 애니메이션 시 그림자가 잘리지 않도록 z-index 미리 확보 */
+    z-index: 1;
+}
+
+.card.selected {
+    /* ✅ [기존] translateY(-5px) -> [수정] -20px로 높여서 확실히 위로 올라가게 함 */
+    /* ✅ [성능] top: -10px 같은 속성보다 transform이 훨씬 부드럽습니다. */
+    transform: translateY(-10px); /* 살짝 커지는 효과 유지 */
+    
+    /* ✅ [추가] 올라간 카드가 다른 카드 위에 오도록 z-index 향상 */
+    z-index: 10; 
 }
 
 .card:active {
@@ -377,22 +394,11 @@ body.dark-theme .card.joker-card .front span.joker-text {
 /* ♥ ♦ 빨강 */
 .red { color: #ff3b30; } /* iOS 특유의 빨간색 */
 
-/* 선택 카드 강조 (iOS 스타일의 밝은 노랑) */
-.card.selected .inner {
-  box-shadow: 0 0 20px #ffdc73; /* 빛나는 효과 */
-  transform: translateY(-5px); /* 살짝 떠오르는 효과 */
-}
-
 /* 승리 카드 강조 (iOS 스타일의 연두색) */
 .win-card .front {
   box-shadow: 0 0 20px #00ff88; /* 빛나는 효과 */
   border: 2px solid #00ff88; /* 테두리 강조 */
   animation: winGlow 1.5s infinite alternate; /* 번쩍임 */
-}
-
-@keyframes winGlow {
-  from { box-shadow: 0 0 10px #00ff88; }
-  to { box-shadow: 0 0 25px #00ff88; }
 }
 
 /* =================== 버튼 (iOS 앱 버튼 스타일) =================== */
@@ -406,7 +412,7 @@ button {
   color: white;
   font-weight: 800; /* iOS 볼드체 */
   box-shadow: 0 6px 18px rgba(0,122,255,0.4); /* 그림자 */
-  transition: all 0.3s ease; /* 부드러운 애니메이션 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   min-width: 120px; /* 버튼 크기 유지 */
   letter-spacing: -0.5px; /* iOS 자간 */
 }
@@ -630,55 +636,19 @@ body.dark-theme button {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* =================== 모바일 반응형 최적화 =================== */
-@media (max-width: 400px) {
-  .settings-bar {
-    top: 10px;
-    right: 10px;
-    gap: 10px;
-  }
-  
-/* 언어 변경 (왼쪽 상단) */
-  #langSelect {
-    position: absolute;
-    top: 15px;
-    left: 15px; /* 왼쪽 배치 */
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.15); 
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 10px 14px; 
-    border-radius: 16px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    appearance: none;
-    -webkit-appearance: none;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-  }
-
-  /* 다크모드 버튼 (오른쪽 상단) */
-  #themeToggle {
-    position: absolute;
-    top: 15px;
-    right: 15px; /* 오른쪽 배치 */
-    z-index: 1000;
-    min-width: 48px !important;
-    width: 48px;
-    height: 48px;
-    padding: 0 !important;
-    border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-  }
+#howToTitle {
+  /* 4. [핵심] 비틀림 방지 설정 */
+  line-height: 1 !important;         /* 줄높이 제거로 처짐 방지 */
+  transform: none !important;        /* 다른 요소의 기울기 상속 차단 */
+  vertical-align: middle !important;
 }
 
+#howToContent {
+  text-align: left;
+  line-height: 1.6;
+  padding: 0 10px; /* 양옆 여백 추가 */
+  word-break: keep-all; /* 단어가 잘리지 않게 */
+}
 
 /* ✅ 게임 방법 버튼 전용 스타일 (새로 추가) */
 .how-to-btn {
@@ -763,4 +733,27 @@ button,
         transparent 10px
     );
     border-radius: 8px;
+}
+
+
+/* 기존 .card의 부드러움을 위해 GPU 가속만 활성화합니다. */
+.inner {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+
+/* 3. 모바일 터치 반응 속도 향상 */
+button, .card, #bet, #langSelect {
+  cursor: pointer;
+  /* 클릭 시 딜레이를 줄여주는 설정 */
+  touch-action: manipulation; 
+}
+
+/* 4. [기능용] 피버 모드 및 조커 스타일 (기존 디자인을 덮어쓰지 않고 '추가'만 됨) */
+/* 이 클래스들은 자바스크립트에서 호출될 때만 작동하므로 평소 디자인엔 영향이 없습니다. */
+body.fever-mode {
+  /* 기존 배경색 위에 살짝 붉은 기운만 얹음 */
+  box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.2);
 }
