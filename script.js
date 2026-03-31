@@ -2,8 +2,8 @@
 let deck = [], hand = [], selected = [];
 
 // 💾 1. 로컬 스토리지에서 저장된 돈 불러오기 (없으면 3,000원 시작)
-let jackpot = Number(localStorage.getItem('poker-jackpot')) || 0;
-let money = Number(localStorage.getItem('poker-money')) || 3000;
+let jackpot = 0;      // 항상 0으로 시작
+let money = 3000
 
 let gameCount = Number(localStorage.getItem('poker-game-count')) || 0;
 
@@ -429,13 +429,13 @@ setTimeout(() => {
     const scrollTop = window.scrollY + rect.bottom - window.innerHeight + 20; 
     window.scrollTo({ top: scrollTop, behavior: 'smooth' });
   }
-}, 50); // 렌더링 후 약간의 딜레이
+}, 500); // 렌더링 후 약간의 딜레이
 
 // draw 단계와 autoHold
 setTimeout(() => { 
   phase = "draw"; 
   autoHold(); 
-}, 1000);
+}, 1500);
 }
 
 function exchange() {
