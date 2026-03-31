@@ -2,8 +2,9 @@
 let deck = [], hand = [], selected = [];
 
 // 💾 1. 로컬 스토리지에서 저장된 돈 불러오기 (없으면 3,000원 시작)
-let jackpot = Number(localStorage.getItem('poker-jackpot')) || 0;
-let money = Number(localStorage.getItem('poker-money')) || 3000;
+let jackpot = 0;      // 항상 0으로 시작
+let money = 3000
+
 let gameCount = Number(localStorage.getItem('poker-game-count')) || 0;
 
 // 🔊 [추가] 전역 볼륨 변수 (기본값 0.5)
@@ -420,8 +421,21 @@ function startGame() {
   document.getElementById("exchangeBtn").style.display = "inline-block";
   document.getElementById("result").innerText = "";
 
-  setTimeout(autoHold, 1500);
-  setTimeout(() => { phase = "draw"; }, 1000);
+// 카드와 버튼까지 포함해서 스크롤
+setTimeout(() => {
+  const gameArea = document.getElementById("gameArea");
+  if (gameArea) {
+    const rect = gameArea.getBoundingClientRect();
+    const scrollTop = window.scrollY + rect.bottom - window.innerHeight + 20; 
+    window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+  }
+}, 50); // 렌더링 후 약간의 딜레이
+
+// draw 단계와 autoHold
+setTimeout(() => { 
+  phase = "draw"; 
+  autoHold(); 
+}, 1000);
 }
 
 function exchange() {
@@ -523,6 +537,7 @@ function resetUI() {
   document.getElementById("exchangeBtn").style.display = "none";
   document.getElementById("bet").disabled = false;
   phase = "idle";
+  
 }
 
 function autoHold() {
