@@ -506,6 +506,8 @@ function finishGame() {
     resultEl.innerText = `${t.ranks[rank]}${jackpotText} (${win.toLocaleString()}) - ${multiplier}${t.unit}`;
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+    
+
     const contribution = isJackpotWonLocal ? 0 : (win * 0.02);
     if (multiplier >= 1) {
       miniValue = win; 
@@ -527,9 +529,12 @@ function finishGame() {
       setTimeout(resetUI, 1500);
     }
   } else {
-    resultEl.innerText = t.ranks[rank];
-    resetUI();
-  }
+     // 패배 메시지에도 스크롤 추가
+  resultEl.innerText = t.ranks[rank];
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+  resetUI();
+}
 }
 
 function resetUI() {
