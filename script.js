@@ -2,8 +2,8 @@
 let deck = [], hand = [], selected = [];
 
 // 💾 1. 로컬 스토리지에서 저장된 돈 불러오기 (없으면 3,000원 시작)
-let jackpot = 0;      // 항상 0으로 시작
-let money = 3000
+let jackpot = Number(localStorage.getItem('poker-jackpot')) || 0;
+let money = Number(localStorage.getItem('poker-money')) || 3000;
 
 let gameCount = Number(localStorage.getItem('poker-game-count')) || 0;
 
